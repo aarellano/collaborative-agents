@@ -132,7 +132,7 @@ public class PartitionsShortestPathFloyd {
 	
 	public void logPartitions(MapPartitioning partitioner) {
 		FileLinesWriter writer = new FileLinesWriter(
-				Options.PATH_RES+"mst.txt", false);
+				Options.PATH_LOGS+"mst.txt", false);
 		String edge = "";
 		Partition from;
 		Vector<Partition> toList;

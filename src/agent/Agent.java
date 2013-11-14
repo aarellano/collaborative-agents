@@ -512,7 +512,7 @@ public class Agent {
 	public void logWeightsDist(Vector<Double> weights, Vector<Point> points)
 	{
 		FileLinesWriter writer = new FileLinesWriter(
-				Options.PATH_RES+"suggestion_dist.txt", false);
+				Options.PATH_LOGS+"suggestion_dist.txt", false);
 		String row = "";
 		//int count = 0;
 		for(int i = 0; i < mapBuilder.getMap().getHeight(); i++) {
