@@ -11,9 +11,21 @@ import environment.Options;
 
 public class PartitionsShortestPathFloyd {
 
-	public static int MY_INFINITY = Integer.MAX_VALUE;
+	public static int MY_INFINITY = 10000;
+	// Adjacency matrix: adjMatrix[i][j] = MY_INFINITY if partition i is 
+	// not a direct neighbor to partition j
 	private Range[][] adjMatrix;
+	
+	// Distance matrix: dis[i][j] has the minimum distance required to go from 
+	// partition i to partition j
 	int[][] dist;
+	
+	// Path matrix: use this to derive the shortest path with the minimum distance
+	// it uses something like backward path tracing (starts from the destination till the source
+	// previous[i] gives you a vector of the previous partition to visit (starting from the destination) 
+	// if you want a path starting from source partition i  
+	// e.g. previous[i][j] gives you the previous partition you should visit if you are 
+	// currently at partition j & want to go backward to source partition i 
 	int[][] previous;
 	
 	public PartitionsShortestPathFloyd(MapPartitioning partitioner)
@@ -66,7 +78,7 @@ public class PartitionsShortestPathFloyd {
 			for(int j = i+1; j < size; j++)
 			{
 				Partition to = partitioner.getPartitionByLabel(j+1);
-				adjMatrix[i][j] = adjMatrix[j][i] = from.getPartitionIntersection(to);
+				adjMatrix[i][j] = adjMatrix[j][i] = from.getPartitionHorizontalIntersection(to);
 				adjMatrix[i][j].weight = from.getHeight();
 				adjMatrix[j][i].weight = to.getHeight();
 			}
@@ -138,7 +150,7 @@ public class PartitionsShortestPathFloyd {
 			for (Partition to : toList) {
 				edge = "";
 				if(from.getWidth() > from.getHeight()) {	// Horizontal
-					Range inter = from.getPartitionIntersection(to);
+					Range inter = from.getPartitionHorizontalIntersection(to);
 					float x = inter.from+(inter.to-inter.from)/2.0f;
 					float y_from = from.getRow()+(from.getHeight()-1)/2.0f;
 					float y_to = to.getRow()+(to.getHeight()-1)/2.0f;

@@ -7,6 +7,7 @@ public class Options {
 	public int Ds = 1;	// Sensor range
 	public boolean loadMap = false;	// Map is known/unknown
 	public boolean startingPosManual = false;	// starting positions are manual in code, or loaded from the map
+	public boolean fullCommunication = true;
 	
 	// Environment settings
 	//======================
@@ -33,6 +34,7 @@ public class Options {
 	public boolean loopOnGames = true;
 	public boolean viewMapKnowledge = true;	// draw map built by agents
 	public boolean viewVisitedCells = false; // draw visited cells
+	public boolean viewMapPartitions = false; // draw map partitions
 	public boolean ViewTrajectories = true; // draw coverage trajectories
 
 	public boolean debugMode = true;
@@ -56,10 +58,17 @@ public class Options {
 		viewNone();
 		viewVisitedCells = true;
 	}
+	
+
+	public void setViewMapPartitions() {
+		viewNone();
+		viewMapPartitions = true;
+	}
 
 	private void viewNone() {
 		viewMapKnowledge = false;
 		viewVisitedCells = false;
+		viewMapPartitions = false;
 	}
 
 	public static String strategyName(int strategy) {
@@ -79,4 +88,5 @@ public class Options {
 		}
 		return s;
 	}
+
 }

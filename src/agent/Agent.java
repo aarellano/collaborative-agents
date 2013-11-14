@@ -145,6 +145,12 @@ public class Agent {
 			}
 		}
 		
+		if (env.options.fullCommunication) {
+			Agent[] agents = env.getSeekers();
+			for (Agent agent : agents) {
+				if(!neighbors.contains(agent)) neighbors.add(agent);
+			}
+		}
 		// Share news with neighbors
 		for (Agent neighbour : neighbors) {
 			this.commitToSeeker(neighbour);
@@ -466,6 +472,10 @@ public class Agent {
 	
 	public boolean isStartingCell(Point cell) {
 		return cell.equals(initialPos.coordinates);
+	}
+
+	public int getPartitionLabelOfCell(Point p) {
+		return mapBuilder.getPlanner().getPartitionLabelOfCell(p);
 	}
 	
 	public Map getMap() {

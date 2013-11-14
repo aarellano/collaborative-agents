@@ -81,6 +81,7 @@ public class Planner {
 		this.map = map;
 		partitioner = new RectanglarPartitioning();
 		partitioner.partitionMap(this.map);
+		//partitioner.printPartitions();
 		shortestPathBuilder = new PartitionsShortestPathFloyd(partitioner);
 		shortestPathBuilder.logPartitions(partitioner);
 		
@@ -253,7 +254,7 @@ public class Planner {
 			fromPoint.row -= distance;
 		}
 		
-		Range intersection = fromPartition.getPartitionIntersection(toPartition);
+		Range intersection = fromPartition.getPartitionHorizontalIntersection(toPartition);
 		if(fromPoint.col < intersection.from)	//East
 		{
 			if(!path.approximateCountOnly)
@@ -437,7 +438,12 @@ public class Planner {
 		cachedPaths.clear();
 	}
 	
+	public int getPartitionLabelOfCell(Point p) {
+		return partitioner.getLabelOfCell(p.row, p.col);
+	}
+	
 	public Map getMap() {
 		return map;
 	}
+
 }

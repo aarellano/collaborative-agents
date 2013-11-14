@@ -186,6 +186,14 @@ public class OptionsView {
 			}
 		});
 	    
+	    choice = new Button(viewingInfoGroup, SWT.RADIO);
+	    choice.setText("View Map Partitions");
+	    choice.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(final SelectionEvent e) {
+				env.options.setViewMapPartitions();
+			}
+		});
+	    
 	    final Button debug = new Button(viewingInfoGroup, SWT.CHECK);
 	    debug.setText("Debug Mode");
 	    debug.setSelection(env.options.debugMode);

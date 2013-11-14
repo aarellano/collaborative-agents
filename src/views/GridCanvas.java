@@ -87,6 +87,12 @@ public class GridCanvas extends Canvas {
 	    	}
 	    }
 	    
+	    if(parent.env.options.viewMapPartitions) {
+		    for (Agent seeker : parent.env.getSeekers()) {
+		    	drawPartitions(g, seeker.getID());
+			}
+	    }
+	    
 	    if(parent.env.options.ViewTrajectories) {
 //		    for (Seeker seeker : parent.env.getSeekers()) {
 //		    	drawMeets(g, seeker.getTrajectory());
@@ -391,6 +397,26 @@ public class GridCanvas extends Canvas {
 	Color[] colors = {Color.BLUE, Color.GREEN, Color.RED, 
 			Color.CYAN, Color.MAGENTA, Color.ORANGE, Color.PINK, 
 			Color.GRAY, Color.LIGHT_GRAY};
+	
+	public void drawPartitions(Graphics g, int id) {
+		int width = getSize().width, height = getSize().height;
+	    int heightOfRow = height / rows;
+	    int widthOfCol = width / columns;
+		Agent agent = parent.env.getSeekers()[id-1];
+		Color color;
+		Point p;
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < columns; j++) {
+				p = new Point(i,j);
+				int l = agent.getPartitionLabelOfCell(p);
+				if(l == -1) color = Color.DARK_GRAY;
+				else color = colors[(l-1)%colors.length];
+				g.setColor(color);
+				g.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, 
+						widthOfCol-1, heightOfRow-1);
+			}
+		}
+	}
 	
 	private boolean isDuplicated(Point current, Point next, Agent iSeeker) {
 		int count = 1;
