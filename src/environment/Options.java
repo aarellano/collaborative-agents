@@ -1,5 +1,7 @@
 package environment;
 
+import agent.coverage.CoverageAlgorithmEnum;
+
 public class Options {
 	
 	// Agent settings
@@ -8,6 +10,7 @@ public class Options {
 	public boolean loadMap = false;	// Map is known/unknown
 	public boolean startingPosManual = false;	// starting positions are manual in code, or loaded from the map
 	public boolean fullCommunication = true;
+	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	
 	// Environment settings
 	//======================
