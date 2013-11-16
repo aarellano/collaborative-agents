@@ -1,7 +1,10 @@
 package lib.datastructs;
 
+import java.util.Iterator;
 import java.util.Stack;
 import java.util.Vector;
+
+import agent.AgentStatus;
 
 
 public class Path {
@@ -68,6 +71,79 @@ public class Path {
 
 	public Point getDestination() {
 		return destination;
+	}
+	
+	public void setActionsFromTrajectory(AgentStatus status) {
+		OrientationEnum orientation = status.orientation;
+		
+		Point currentPos = this.source;
+		Iterator itr = pathCells.iterator();
+		
+		while(itr.hasNext()){
+			Point nextPos = (Point) itr.next();
+			if (currentPos.row == nextPos.row) {
+				if (currentPos.col + 1 == nextPos.col) {
+					if (orientation == OrientationEnum.EAST) {
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.NORTH) {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.SOUTH) {
+						pathActions.add(ActionEnum.ROT_L);
+						pathActions.add(ActionEnum.FORWARD);
+					} else {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					}
+				} else {
+					if (orientation == OrientationEnum.WEST) {
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.NORTH) {
+						pathActions.add(ActionEnum.ROT_L);
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.SOUTH) {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					} else {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					}
+				}
+			} else{
+				if (currentPos.row + 1 == nextPos.row) {
+					if (orientation == OrientationEnum.SOUTH) {
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.EAST) {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.WEST) {
+						pathActions.add(ActionEnum.ROT_L);
+						pathActions.add(ActionEnum.FORWARD);
+					} else {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					}
+				} else {
+					if (orientation == OrientationEnum.NORTH) {
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.EAST) {
+						pathActions.add(ActionEnum.ROT_L);
+						pathActions.add(ActionEnum.FORWARD);
+					} else if (orientation == OrientationEnum.WEST) {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					} else {
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.ROT_R);
+						pathActions.add(ActionEnum.FORWARD);
+					}
+				}
+			}
+			currentPos = nextPos;
+		}
 	}
 	
 	public void printPath(Stack<Partition> path)

@@ -15,6 +15,7 @@ import lib.datastructs.Path;
 import lib.datastructs.Point;
 import lib.datastructs.PointValue;
 import lib.datastructs.PointValueComparator;
+import agent.coverage.CFSAlgorithm;
 import agent.coverage.CoverageAlgorithm;
 import agent.coverage.OldSearchAlgorithm;
 import environment.EnvCellEnum;
@@ -59,7 +60,7 @@ public class Agent {
 			coverageAlgorithm = new OldSearchAlgorithm();
 			break;
 		case CFS:
-			// create CFS algorithm class
+			coverageAlgorithm = new CFSAlgorithm();
 			break;
 		case GFS:
 			// create GFS algorithm class

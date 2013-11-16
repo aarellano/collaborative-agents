@@ -4,19 +4,19 @@ import java.util.Vector;
 
 import lib.datastructs.Map;
 import lib.datastructs.Point;
-import lib.datastructs.ScanStatusEnum;
+import lib.datastructs.VisitedStatusEnum;
 import agent.planner.Planner;
 import environment.EnvCellEnum;
 
 public class SearchMap {
 
-	private ScanStatusEnum[][] visited;
+	private VisitedStatusEnum[][] visited;
 //	private int[][] territoryValue;
 	private Agent seeker;
 
 	public SearchMap(int width, int height, Agent parent) {
 		super();
-		visited = new ScanStatusEnum[height][width];
+		visited = new VisitedStatusEnum[height][width];
 //		territoryValue = new int[height][width];
 		this.seeker = parent;
 	}
@@ -24,7 +24,7 @@ public class SearchMap {
 	public void init() {
 		for(int i = 0; i < visited.length; i++)
 			for(int j = 0; j < visited[0].length; j++)
-				visited[i][j] = ScanStatusEnum.UNSCANNED;
+				visited[i][j] = VisitedStatusEnum.UNVISITED;
 		
 		//initTerritory();
 	}
@@ -87,23 +87,23 @@ public class SearchMap {
 	}
 
 	public void scanCell(int row, int col) {
-		visited[row][col] = ScanStatusEnum.SCANNED;
+		visited[row][col] = VisitedStatusEnum.SCANNED;
 	}
 	
 	public void visitCell(int row, int col) {
-		visited[row][col] = ScanStatusEnum.VISITED;
+		visited[row][col] = VisitedStatusEnum.VISITED;
 	}
 	
 	public boolean isScannedCell(int row, int col) {
-		return visited[row][col] == ScanStatusEnum.SCANNED || 
-				visited[row][col] == ScanStatusEnum.VISITED;
+		return visited[row][col] == VisitedStatusEnum.SCANNED || 
+				visited[row][col] == VisitedStatusEnum.VISITED;
 	}
 	
 	public boolean isVisitedCell(int row, int col) {
-		return visited[row][col] == ScanStatusEnum.VISITED;
+		return visited[row][col] == VisitedStatusEnum.VISITED;
 	}
 	
-	public ScanStatusEnum getScanStatusCell(int row, int col) {
+	public VisitedStatusEnum getScanStatusCell(int row, int col) {
 		return visited[row][col];
 	}
 
@@ -114,7 +114,7 @@ public class SearchMap {
 			for(int j = 0; j < width; j++) {
 				EnvCellEnum cell = map.getCell(i, j);
 				visited[i][j] = (cell == EnvCellEnum.FREE) ? 
-						ScanStatusEnum.VISITED : ScanStatusEnum.UNSCANNED;
+						VisitedStatusEnum.VISITED : VisitedStatusEnum.UNVISITED;
 			}
 		}
 		seeker.setInitialPos(map.startingPoint.clone());

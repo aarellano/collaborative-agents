@@ -6,16 +6,16 @@ import java.util.Arrays;
 
 import lib.datastructs.OrientationEnum;
 import lib.datastructs.Point;
-import lib.datastructs.ScanStatusEnum;
+import lib.datastructs.VisitedStatusEnum;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import environment.Environment;
 
-public class MapSearcherTest {
-	private MapSearcher searcher;
-	private MapSearcher searcher2;
+public class ShortestPathNaiveTest {
+	private ShortestPathNaive searcher;
+	private ShortestPathNaive searcher2;
 	
 	@Before
 	public void setUp() throws Exception 
@@ -25,15 +25,15 @@ public class MapSearcherTest {
 		Point[] coordinates = {coords};
 		Environment env = new Environment("rep", coordinates);
 		Agent agent = new Agent(0, status, env);
-		ScanStatusEnum[][] currentStatus = {{ScanStatusEnum.UNSCANNED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED},
-											{ScanStatusEnum.UNSCANNED, ScanStatusEnum.UNSCANNED, ScanStatusEnum.UNSCANNED, ScanStatusEnum.VISITED},
-											{ScanStatusEnum.UNSCANNED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED}};
-		searcher = new MapSearcher(agent, currentStatus);
+		VisitedStatusEnum[][] currentStatus = {{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED},
+											{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED},
+											{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED}};
+		searcher = new ShortestPathNaive(agent, currentStatus);
 		
-		ScanStatusEnum[][] currentStatus2 = {{ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED},
-											{ScanStatusEnum.VISITED, ScanStatusEnum.UNSCANNED, ScanStatusEnum.UNSCANNED, ScanStatusEnum.VISITED},
-											{ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED, ScanStatusEnum.VISITED}};
-		searcher2 = new MapSearcher(agent, currentStatus2);
+		VisitedStatusEnum[][] currentStatus2 = {{VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED},
+											{VisitedStatusEnum.VISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED},
+											{VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED}};
+		searcher2 = new ShortestPathNaive(agent, currentStatus2);
 	}
 
 	@Test

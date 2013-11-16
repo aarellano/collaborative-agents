@@ -113,6 +113,11 @@ public class Map {
 		return map[row][col] == EnvCellEnum.BLOCKED;
 	}
 	
+	public boolean isFree(int row, int col)
+	{
+		return map[row][col] == EnvCellEnum.FREE;
+	}
+	
 	public boolean isValidCell(int row, int col)
 	{
 		return isValidRow(row) && isValidCol(col);
