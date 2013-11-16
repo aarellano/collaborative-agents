@@ -11,23 +11,14 @@ import lib.datastructs.VisitedStatusEnum;
 
 public class ShortestPathNaive {
 
-//	private VisitedStatusEnum[][] visited;
 	private Agent agent;
 
-	public ShortestPathNaive(Agent parent/*, VisitedStatusEnum[][] currentStatus*/) {
+	public ShortestPathNaive(Agent parent) {
 		super();
 		this.agent = parent;
-		// parent.getMap().isObstacle(row, col)
-		
-		//clone currentStatus
-//		this.visited = new VisitedStatusEnum[currentStatus.length][];
-//		for (int i = 0; i < currentStatus.length; i++){
-//			this.visited[i] = currentStatus[i].clone();
-//		}
 	}
 	
 	public Vector<Point> getPath2NearestUnvisited(Point currentPos, SearchMap currentSearchMap) {
-		Point borrar = new Point(4,4);
 		Vector<Point> trajectory = new Vector<Point>();
 		int nRows = this.agent.getMap().getHeight();
 		int nCols = this.agent.getMap().getWidth();
@@ -45,14 +36,13 @@ public class ShortestPathNaive {
 		queue.add(currentPos);
 		Boolean found = false;
 		Point lastPos = null;
-//		Point prevPos = currentPos;
 		while (!queue.isEmpty() && !found){
 			lastPos = queue.remove();
 			neighs = getFreeNeighs(lastPos, nRows, nCols);
 			Iterator<Point> itr = neighs.iterator();
-			while (itr.hasNext()){
+			while (itr.hasNext() && !found){
 				Point v = (Point) itr.next();
-				if (p1.equals(prevNeighs[v.row][v.col])){ //this point was not traversed
+				if (p1.equals(prevNeighs[v.row][v.col]) && !v.equals(currentPos)){ //this point was not traversed
 					prevNeighs[v.row][v.col] = lastPos;
 					queue.add(v);
 				}
@@ -67,17 +57,7 @@ public class ShortestPathNaive {
 			while(!p1.equals(prevNeighs[lastPos.row][lastPos.col])){
 				trajectory.add(0,lastPos);
 				lastPos = prevNeighs[lastPos.row][lastPos.col];
-				if (currentPos.equals(borrar))
-					System.out.println(lastPos.toString());
-				if (currentPos.equals(borrar)){
-					System.out.println(this.agent.getMap().getCell(4,4));
-					System.out.println(this.agent.getMap().getCell(4,3));
-					System.out.println(this.agent.getMap().getCell(4,5));
-					System.out.println(this.agent.getMap().getCell(5,3));
-				}
 			}
-			if (currentPos.equals(borrar))
-				System.out.println("sale2");
 		}
 		
 		return trajectory;
@@ -118,7 +98,6 @@ public class ShortestPathNaive {
 
 	private Vector<Point> getFreeNeighs(Point pos, int nRows, int nCols){
 		Vector<Point> neighs = new Vector<Point>(4);
-		//TODO: I modified the VISITED by FREE. Does it work? 
 		if ((pos.row-1 >= 0) && (this.agent.getMap().isFree(pos.row-1,pos.col))){
 			Point p = new Point(pos.row-1, pos.col);
 			neighs.add(p);

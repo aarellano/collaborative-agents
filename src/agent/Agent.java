@@ -186,12 +186,14 @@ public class Agent {
 				evaluateCell(mapBuilder.getDestinatedPath().getDestination()) == 0) {
 			mapBuilder.setDestinatedPath(selectPath());
 		}
-		ActionEnum action = null;
-		do {
-			action = mapBuilder.getDestinatedPath().getNextPathAction();
-			applyAction(action);
-		}while(action != ActionEnum.FORWARD);
-		
+		if (!mapBuilder.getDestinatedPath().getPathActions().isEmpty()){
+			ActionEnum action = null;
+			do {
+				action = mapBuilder.getDestinatedPath().getNextPathAction();
+				if (action != null)
+					applyAction(action);
+			}while(action != ActionEnum.FORWARD);
+		}
 		trajectory.add(status.coordinates.clone());
 	}
 	
