@@ -152,7 +152,7 @@ public class Map {
 	}
 	
 	public Vector<Point> getNeighborsWithValue(Point p, EnvCellEnum neighborValue, int distance) {
-		Vector<Point> neighbors = getCellsWithinDistance(p, distance);
+		Vector<Point> neighbors = getCellsWithinDistance(p, distance, VisionDirectionEnum.ALL_D);
 		Vector<Point> result = new Vector<Point>();
 		for (Point point : neighbors) {
 			if(getCell(point.row, point.col) == neighborValue  && !isSightLineBlocked(p, point))
@@ -169,28 +169,62 @@ public class Map {
 	 * list of cells with Manhattan distance d from center cell
 	 * @param center
 	 * @param d
+	 * @param visionDirection 
 	 * @return
 	 */
-	public Vector<Point> getCellsWithinDistance(Point center, int d) {
+	public Vector<Point> getCellsWithinDistance(Point center, int d, VisionDirectionEnum visionDirection) {
 		Vector<Point> cells = new Vector<Point>();
-		Point from = new Point(center.row-d, center.col-d);
-		Point to = new Point(center.row+d, center.col+d);
-		for(int i = from.row; i <= to.row; i++) {
-			if(isValidRow(i)) {
-				for(int j = from.col; j <= to.col; j++) {
-					Point p = new Point(i, j);
-					if(isValidCol(j) && center.manDistance(p) <= d)
-						cells.add(p);
+		
+		switch (visionDirection) {
+		case ONE_D:
+			
+			break;
+			
+		case FOUR_D:
+			cells.add(new Point(center.row, center.col));
+			// Look Left
+			for(int col = center.col-1, row = center.row; col >= 0; col--) {
+				cells.add(new Point(row, col));
+			}
+			// Look Right
+			for(int col = center.col+1, row = center.row; col < width; col++) {
+				cells.add(new Point(row, col));
+			}
+			// Look Up
+			for(int col = center.col, row = center.row-1; row >= 0; row--) {
+				cells.add(new Point(row, col));
+			}
+			// Look Left
+			for(int col = center.col, row = center.row+1; row < height; row++) {
+				cells.add(new Point(row, col));
+			}
+			break;
+			
+		case ALL_D:
+			Point from = new Point(center.row-d, center.col-d);
+			Point to = new Point(center.row+d, center.col+d);
+			for(int i = from.row; i <= to.row; i++) {
+				if(isValidRow(i)) {
+					for(int j = from.col; j <= to.col; j++) {
+						Point p = new Point(i, j);
+						if(isValidCol(j) && center.manDistance(p) <= d)
+							cells.add(p);
+					}
 				}
 			}
+			break;
+			
+		default:
+			break;
 		}
+		
 		return cells;
 	}
 	
 	public int getCellOpenness(Point cell) {
 		int count = 0;
 		//TODO use good heuristic for d, e.g. average partition length
-		Vector<Point> cells = getCellsWithinDistance(cell, 5);
+		Vector<Point> cells = getCellsWithinDistance(cell, 5, VisionDirectionEnum.ALL_D);
 		for (Point point : cells) {
 			if(!isSightLineBlocked(cell, point)) count++;
 		}

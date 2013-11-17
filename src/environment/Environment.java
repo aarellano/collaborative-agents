@@ -47,6 +47,11 @@ public class Environment {
 			agents[i] = new Agent(i+1, 
 					new AgentStatus(start, OrientationEnum.NORTH), this);			
 		}
+		
+		// Give agents unlimited Vision!
+		if(options.unlimitedVision) {
+			options.Ds = Math.max(getEnvWidth(), getEnvHeight());
+		}
 	}
 
 	/**
@@ -105,6 +110,8 @@ public class Environment {
 		}
 
 		// Game Concluded
+		System.out.println("Game took " + clock.getRelativeTimeInClocks() + " turns!");
+		
 		clock.incrementGamesCount();
 		logGameResults(true);
 		
@@ -155,14 +162,15 @@ public class Environment {
 
 	public Vector<Point> sightCells(Point center, int distance) {
 		Vector<Point> cells = new Vector<Point>();
-		Vector<Point> buff = map.getCellsWithinDistance(center, distance);
+		Vector<Point> buff = map.getCellsWithinDistance(center, distance, options.visionDirection);
 		for (Point cell : buff) {
-			if(!map.isSightLineBlocked(center, cell)) cells.add(cell);
+			if(!map.isSightLineBlocked(center, cell)) 
+				cells.add(cell);
 		}
 		return cells;
 	}
 
-	private boolean isGameOver() {
+	private boolean isGameOver() {		
 		return gameover || 
 				(options.terminateOnTimeout && clock.getRelativeTimeInClocks() > 1000);
 	}
@@ -196,8 +204,8 @@ public class Environment {
 
 	public boolean isDestinatedCell(Point p) {
 		for (Agent seeker : agents) {
-			if(seeker.getNextDestination() != null && 
-					seeker.getNextDestination().equals(p)) return true;
+			Point dest = seeker.getNextDestination();
+			if(dest != null && dest.equals(p)) return true;
 		}
 		return false;
 	}

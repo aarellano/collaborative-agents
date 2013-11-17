@@ -195,6 +195,21 @@ public class Agent {
 			}while(action != ActionEnum.FORWARD);
 		}
 		trajectory.add(status.coordinates.clone());
+		
+		checkForTermination();
+	}
+	
+	public void checkForTermination() {
+		// TODO review this termination condition
+		// If there is any unvisited cells
+		for(int row = 0; row < getMap().getHeight(); row++) {
+			for(int col = 0; col < getMap().getWidth(); col++) {
+				if(getMap().isFree(row, col) && !isVisitedCell(new Point(row, col)))
+						return;	// there still some work
+			}
+		}
+		// NO unvisited, work is done
+		env.endGame();
 	}
 	
 	public Point takeAction(OrientationEnum action) {
@@ -477,10 +492,6 @@ public class Agent {
 	
 	public Map getMap() {
 		return mapBuilder.getMap();
-	}
-	
-	public int getSightDistance() {
-		return env.options.Ds;
 	}
 	
 	public Environment getEnv() {

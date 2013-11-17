@@ -28,12 +28,12 @@ public class ShortestPathNaiveTest {
 		VisitedStatusEnum[][] currentStatus = {{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED},
 											{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED},
 											{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED}};
-		searcher = new ShortestPathNaive(agent, currentStatus);
+		searcher = new ShortestPathNaive(agent);
 		
 		VisitedStatusEnum[][] currentStatus2 = {{VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED},
 											{VisitedStatusEnum.VISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED},
 											{VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED}};
-		searcher2 = new ShortestPathNaive(agent, currentStatus2);
+		searcher2 = new ShortestPathNaive(agent);
 	}
 
 	@Test

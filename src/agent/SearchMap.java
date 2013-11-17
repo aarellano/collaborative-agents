@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import lib.datastructs.Map;
 import lib.datastructs.Point;
+import lib.datastructs.VisionDirectionEnum;
 import lib.datastructs.VisitedStatusEnum;
 import agent.planner.Planner;
 import environment.EnvCellEnum;
@@ -75,7 +76,7 @@ public class SearchMap {
 	}
 	
 	public Vector<Point> getNeighborsWithVisited(Point p, boolean visited, int distance) {
-		Vector<Point> neighbors = seeker.getMap().getCellsWithinDistance(p, distance);
+		Vector<Point> neighbors = seeker.getMap().getCellsWithinDistance(p, distance, VisionDirectionEnum.ALL_D);
 		Vector<Point> result = new Vector<Point>();
 		for (Point point : neighbors) {
 			if(isVisitedCell(point.row, point.col) == visited && 

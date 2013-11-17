@@ -1,5 +1,6 @@
 package environment;
 
+import lib.datastructs.VisionDirectionEnum;
 import agent.coverage.CoverageAlgorithmEnum;
 
 public class Options {
@@ -7,8 +8,11 @@ public class Options {
 	// Agent settings
 	//================
 	public int Ds = 1;	// Sensor range
+	public boolean unlimitedVision = true;
+	public VisionDirectionEnum visionDirection = VisionDirectionEnum.FOUR_D;
+	
 	public boolean loadMap = false;	// Map is known/unknown
-	public boolean startingPosManual = false;	// starting positions are manual in code, or loaded from the map
+	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	

@@ -6,17 +6,44 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import lib.datastructs.OrientationEnum;
 import lib.datastructs.Point;
+import lib.datastructs.TwoPoints;
 import agent.Agent;
 import environment.EnvCellEnum;
 
 public class GridCanvas extends Canvas {
 
+	public class TrajInfo {
+		public Color color;
+		public TwoPoints line;
+		public Stroke stroke;
+		public TrajInfo(Color color, TwoPoints line, Stroke stroke) {
+			super();
+			this.color = color;
+			this.line = line;
+			this.stroke = stroke;
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			TrajInfo other = (TrajInfo) obj;
+			return color.equals(other.color) && line.equals(other.line) && 
+					stroke.equals(other.stroke);
+		}
+	}
+	
 	/**
 	 * 
 	 */
@@ -24,6 +51,7 @@ public class GridCanvas extends Canvas {
 	private int rows, columns;
 	private MainScreen parent;
 	private Color[][] cells;
+	private Vector<TrajInfo>[][] trajs;
 	public int origin_x, origin_y;
 	private boolean app_triggered_painting = false;
 	private boolean repaint_all = true;
@@ -39,6 +67,10 @@ public class GridCanvas extends Canvas {
 		this.parent = parent;
 		origin_x = origin_y = 0;
 		cells = new Color[rows][columns];
+		trajs= new Vector[rows][columns];
+		for(int i = 0; i < rows; i++)
+			for(int j = 0; j < columns; j++)
+				trajs[i][j] = new Vector<TrajInfo>();
 		
 		new ToolTip("", this, parent);
 	}
@@ -77,6 +109,8 @@ public class GridCanvas extends Canvas {
 	    			g.setColor(color);
 	    			g.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol-1, heightOfRow-1);
 	    			cells[i][j] = color;
+	    			trajs[i][j].clear();
+	    			
 	    			if(parent.hasBreakpoint(i, j)) {
 	    				g.drawImage(breakpoint, 
 	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, 
@@ -297,6 +331,16 @@ public class GridCanvas extends Canvas {
 		}
 	}
 	
+	BasicStroke solid =
+	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
+	        		10.0f, new float[] {10f}, 0.0f);
+		BasicStroke dashed =
+	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
+	        		10.0f, new float[] {5f}, 0.0f);
+		BasicStroke dotted =
+	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
+	        		10.0f, new float[] {2f}, 0.0f);
+	
 	public void drawTrajectories(Graphics g, int id) {
 		int width = getSize().width, height = getSize().height;
 	    int heightOfRow = height / rows;
@@ -307,15 +351,7 @@ public class GridCanvas extends Canvas {
 	    if(traj.isEmpty()) return;
 	    
 		Graphics2D g2d = (Graphics2D)g;
-		BasicStroke solid =
-	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
-	        		10.0f, new float[] {10f}, 0.0f);
-		BasicStroke dashed =
-	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
-	        		10.0f, new float[] {5f}, 0.0f);
-		BasicStroke dotted =
-	        new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 
-	        		10.0f, new float[] {2f}, 0.0f);
+		
 	    g2d.setStroke(new BasicStroke(4));
 		Point current, next;
 		org.eclipse.swt.graphics.Point p_old = null, p1 = null, p2 = null;
@@ -382,8 +418,20 @@ public class GridCanvas extends Canvas {
 				g2d.setStroke(solid);
 			g.setColor(color);
 
-			g.drawLine(p_old.x, p_old.y, p1.x, p1.y);
-			g.drawLine(p1.x, p1.y, p2.x, p2.y);
+			TwoPoints line = new TwoPoints(new Point(p_old.x, p_old.y),
+					new Point(p1.x, p1.y));
+			TrajInfo info = new TrajInfo(color, line, g2d.getStroke());
+			if(!trajs[current.row][current.col].contains(info)) {
+				g.drawLine(p_old.x, p_old.y, p1.x, p1.y);
+				trajs[current.row][current.col].add(info);
+			}
+			
+			line = new TwoPoints(new Point(p1.x, p1.y),	new Point(p2.x, p2.y));
+			info = new TrajInfo(color, line, g2d.getStroke());
+			if(!trajs[current.row][current.col].contains(info)) {
+				g.drawLine(p1.x, p1.y, p2.x, p2.y);
+				trajs[current.row][current.col].add(info);
+			}
 //			g.drawLine(current.col*widthdOfCol+widthdOfCol/2, 
 //					current.row*heightOfRow+heightOfRow/4, 
 //					next.col*widthdOfCol+widthdOfCol/2, 

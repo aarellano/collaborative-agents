@@ -8,6 +8,7 @@ import lib.datastructs.Path;
 import lib.datastructs.Point;
 import lib.datastructs.PointValue;
 import lib.datastructs.PointValueCollections;
+import lib.datastructs.VisionDirectionEnum;
 import agent.Agent;
 import agent.AgentStatus;
 import agent.MapBuilder;
@@ -23,7 +24,7 @@ public class OldSearchAlgorithm implements CoverageAlgorithm {
 		// Evaluate Cells
 		/////////////////
 		Vector<Point> cells = mapInfo.getMap().getCellsWithinDistance(
-				status.coordinates, 1000);
+				status.coordinates, 1000, VisionDirectionEnum.ALL_D);
 		PriorityQueue<PointValue> weights = agent.evaluateCells(cells);
 		PointValueCollections collections = Utils.getPointAndValueCollections(weights);
 //		if(agent.getEnv().options.LOG)

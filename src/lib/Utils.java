@@ -95,63 +95,39 @@ public class Utils {
 	// Bresenham's line drawing algorithm
 	public static Vector<Point> sightLine(Point from, Point to) {
 		Vector<Point> points = new Vector<Point>();
-		int current_i, current_j;
+		
+		// Bresenham's line drawing algorithm
+		int x = from.col, x2 = to.col;
+		int y = from.row, y2 = to.row;
+		int w = x2 - x ;
+		int h = y2 - y ;
+		int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0 ;
+		if (w<0) dx1 = -1 ; else if (w>0) dx1 = 1 ;
+		if (h<0) dy1 = -1 ; else if (h>0) dy1 = 1 ;
+		if (w<0) dx2 = -1 ; else if (w>0) dx2 = 1 ;
+		int longest = Math.abs(w) ;
+		int shortest = Math.abs(h) ;
+		if (!(longest>shortest)) {
+			longest = Math.abs(h) ;
+			shortest = Math.abs(w) ;
+			if (h<0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
+			dx2 = 0 ;            
+		}
+		int numerator = longest >> 1 ;
+		for (int i=0;i<=longest;i++) {
+			points.add(new Point(y, x));
+			numerator += shortest ;
+			if (!(numerator<longest)) {
+				numerator -= longest ;
+				x += dx1 ;
+				y += dy1 ;
+			} else {
+				x += dx2 ;
+				y += dy2 ;
+			}
+		}
+		points.add(new Point(to.row, to.col));
 
-		// Bresenham's algorithm works only on line in 4th quarter ( 0 < slope < 1)
-	    boolean mirror_i = from.row > to.row;
-	    boolean mirror_j = from.col > to.col;
-
-	    int src_i = from.row;
-	    int src_j = from.col;
-	    int dst_i = mirror_i ? 2*from.row - to.row : to.row;
-	    int dst_j = mirror_j ? 2*from.col - to.col : to.col;
-
-		current_i = src_i; current_j = src_j;
-		points.add(new Point(current_i, current_j));
-	    /////////////////////////////
-		// Vertical Line
-	    if(dst_j == src_j) {
-	        for(int i = src_i; i < dst_i-1; i++) {
-	        	current_i = mirror_i?current_i-1:current_i+1;
-	        	points.add(new Point(current_i, current_j)); // ?Up:Down
-	        }
-	    }
-	    // Horizontal Line
-	    else if(dst_i == src_i) {
-	        for(int j = src_j; j < dst_j-1; j++) {
-	        	current_j = mirror_j?current_j-1:current_j+1;
-	        	points.add(new Point(current_i, current_j));	// ?Left:Right
-	        }
-	    }
-	    // General Line: Bresenham's Line Algorithm
-	    else{
-	        int dj = dst_j - src_j;
-	        int di = dst_i - src_i;
-	        int p = 2*di - dj;
-	        //int i = src_i;
-	        int j = src_j;
-
-	        while(j < dst_j) {
-	            if(p < 0) {
-	                j ++;
-	                //i = i;
-	                p += 2*di;
-	                // Right action
-	                current_j = mirror_j?current_j-1:current_j+1;
-	                points.add(new Point(current_i, current_j));	// ?Left:Right
-	            } else {
-	                j ++;
-	                //i ++;
-	                p += 2*(di-dj);
-	                // Right & Down actions
-	                current_j = mirror_j?current_j-1:current_j+1;
-	                points.add(new Point(current_i, current_j));	// ?Left:Right
-	                current_i = mirror_i?current_i-1:current_i+1;
-	                points.add(new Point(current_i, current_j));	// ?Up:Down
-	            }
-	        }
-	    }
-	    /////////////////////////////
 		return points;
 	}
 	
