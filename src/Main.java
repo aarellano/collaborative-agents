@@ -14,7 +14,7 @@ public class Main {
 		// Set test parameters
 		String mapName = "rep";
 		//Point[] initialPos = new Point[] {new Point(0, 0)};
-		Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 20)};
+		Point[] initialPos = new Point[] {new Point(0, 0), new Point(20, 20)};
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 0), new Point(0, 0)};
 		int strategy = Options.DIAGONAL;
 		CoverageAlgorithmEnum coverageAlgoz = CoverageAlgorithmEnum.CFS;

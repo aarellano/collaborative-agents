@@ -3,6 +3,7 @@
  */
 package lib.datastructs;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.eclipse.swt.graphics.ImageData;
@@ -118,6 +119,11 @@ public class Map {
 		return map[row][col] == EnvCellEnum.FREE;
 	}
 	
+	public boolean isUnknown(int row, int col)
+	{
+		return map[row][col] == EnvCellEnum.UNKNOWN;
+	}
+
 	public boolean isValidCell(int row, int col)
 	{
 		return isValidRow(row) && isValidCol(col);
@@ -276,14 +282,17 @@ public class Map {
 		return false;
 	}
 	
-	public boolean isSightLineBlocked(Point from, Point to)
+	public Point isSightLineBlocked(Point from, Point to)
 	{
+		Point blocker = null;
 		Vector<Point> path = Utils.sightLine(from, to);
-		boolean blocked = false;
-		for (Point p : path) {
-			blocked = blocked || isObstacle(p.row, p.col);
+		Iterator<Point> itr = path.iterator();
+		while (itr.hasNext() && (blocker == null)) {
+			Point p = itr.next();
+			if (isObstacle(p.row, p.col))
+				blocker = p;
 		}
-		return blocked;
+		return blocker;
 	}
 	
 	/**

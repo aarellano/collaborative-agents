@@ -24,7 +24,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 		SearchMap map = agent.getSearchMap();
 		
 		ShortestPathNaive sp = new ShortestPathNaive(agent);
-		Vector<Point> trajectory = sp.getPath2NearestUnvisited(status.coordinates, map);
+		Vector<Point> trajectory = sp.getCFS(status.coordinates, map);
 		
 		Path result = mapInfo.getPlanner().pathPlan(status, status.coordinates);
 		result.getPathCells().addAll(trajectory);
