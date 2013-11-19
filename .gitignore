@@ -29,3 +29,6 @@ local.properties
 
 # Runs results
 res/**
+
+# SWT library, due to different architectures
+swt.jar
