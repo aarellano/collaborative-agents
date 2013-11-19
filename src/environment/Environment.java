@@ -165,7 +165,7 @@ public class Environment {
 		Vector<Point> buff = map.getCellsWithinDistance(center, distance, options.visionDirection);
 		Point blocker = null;
 		for (Point cell : buff) {
-			blocker = map.isSightLineBlocked(center, cell);
+			blocker = map.getSightLineBlocker(center, cell);
 			if(blocker == null)
 				cells.add(cell);
 			else

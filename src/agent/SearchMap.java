@@ -81,7 +81,7 @@ public class SearchMap {
 		for (Point point : neighbors) {
 			if(isVisitedCell(point.row, point.col) == visited && 
 					!seeker.getMap().isObstacle(point.row, point.col) &&
-					!seeker.getMap().isSightLineBlocked(p, point))
+					seeker.getMap().getSightLineBlocker(p, point) == null)
 				result.add(point);
 		}
 		return result;
