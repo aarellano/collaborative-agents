@@ -1,6 +1,7 @@
 package environment;
 
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import lib.FileLinesWriter;
@@ -31,12 +32,10 @@ public class Environment {
 
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
-
-	public Environment(String mapID, Point[] coordinates) {
-		map = Map.loadMapWithID(mapID);
+	
+	public void init() {
 		options = new Options();
-		initialPositions = coordinates;
-
+		
 		tipInfo = new Hashtable<Point, String>();
 		maxs = new Vector<Point>();
 
@@ -52,6 +51,18 @@ public class Environment {
 		if(options.unlimitedVision) {
 			options.Ds = Math.max(getEnvWidth(), getEnvHeight());
 		}
+	}
+	
+	public Environment(String mapID, int agentsCount) {
+		map = Map.loadMapWithID(mapID);
+		initialPositions = generateRandomPositions(agentsCount);
+		init();
+	}
+
+	public Environment(String mapID, Point[] coordinates) {
+		map = Map.loadMapWithID(mapID);
+		initialPositions = coordinates;
+		init();
 	}
 
 	/**
@@ -69,6 +80,20 @@ public class Environment {
 			}
 			//seekers[i].loadSearch("visited_2");
 		}
+	}
+	
+	public Point[] generateRandomPositions(int agentsCount) {
+		Point[] positions = new Point[agentsCount];
+		Random rand = new Random(System.currentTimeMillis());
+		for(int i = 0 ; i < agentsCount; i++) {
+			Point p = null;
+			do {
+				p = new Point(rand.nextInt(getEnvHeight()), 
+						rand.nextInt(getEnvWidth()));
+			} while(!map.isFree(p.row, p.col));
+			positions[i] = p;
+		}
+		return positions;
 	}
 
 	/**
@@ -152,7 +177,8 @@ public class Environment {
 	public EnvCellEnum readSensorsForCell(Point cell) {
 		EnvCellEnum value = map.getCell(cell.row, cell.col);
 		for (Agent seeker : agents) {
-			if(seeker.getStatus() != null && seeker.getStatus().coordinates.equals(cell)) {
+			AgentStatus status = seeker.getStatus();
+			if(status != null && status.coordinates.equals(cell)) {
 				value = EnvCellEnum.OCCUP_AGENT;
 				break;
 			}
@@ -195,11 +221,13 @@ public class Environment {
 		return mask;
 	}
 
+	int maxMask = -1;
 	public int getMaxSharedMask() {
-		int mask = 0;
+		if (maxMask != -1) return maxMask;
+		maxMask = 0;
 		for(int i = 0; i < agents.length; i++)
-			mask += Math.pow(2, i);
-		return mask;
+			maxMask += Math.pow(2, i);
+		return maxMask;
 	}
 
 	public boolean isDestinatedCell(Point p) {

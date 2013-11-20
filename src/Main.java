@@ -14,13 +14,14 @@ public class Main {
 		// Set test parameters
 		String mapName = "rep";
 		//Point[] initialPos = new Point[] {new Point(0, 0)};
-		Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 20)};
+		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 20)};
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 0), new Point(0, 0)};
 		int strategy = Options.DIAGONAL;
 		CoverageAlgorithmEnum coverageAlgoz = CoverageAlgorithmEnum.CFS;
 
 		// Initialize the environment
-		Environment env = new Environment(mapName, initialPos);
+		//Environment env = new Environment(mapName, initialPos);
+		Environment env = new Environment(mapName, 3);
 		env.options.strategy = strategy;
 		env.options.coverageAlgorithm = coverageAlgoz;		
 		env.testName = env.getEnvID()+"/"+

@@ -56,7 +56,7 @@ public class GridCanvas extends Canvas {
 	private boolean app_triggered_painting = false;
 	private boolean repaint_all = true;
 	private boolean cancelRedrawUpdates;
-	private Color[] seekers = {Color.BLUE, Color.RED, Color.BLUE};
+	private Color[] seekers;
 	
 	private Image breakpoint = Toolkit.getDefaultToolkit().getImage("break.png");
 	
@@ -75,16 +75,31 @@ public class GridCanvas extends Canvas {
 		new ToolTip("", this, parent);
 	}
 
+	Image backBuffer; 
+	Graphics bBG; 
 	@Override
-	public void paint(Graphics g) {
+	public void paint(Graphics graphics) {
+		
+		if( backBuffer == null )  
+	      {  
+	          backBuffer = createImage( getWidth(), getHeight() );  
+	          bBG = backBuffer.getGraphics();  
+	      }  
 //		if(!app_triggered_painting)
 //			super.paint(g);
+		
+		if(seekers == null) {
+			seekers = new Color[parent.env.getSeekers().length];
+			for(int i = 0 ; i < seekers.length; i++) {
+				seekers[i] = colors[i%colors.length];
+			}
+		}
 		
 		int width = getSize().width, height = getSize().height;
 	    int heightOfRow = height / rows;
 	    int widthOfCol = width / columns;
 	    
-	    g.setColor(Color.BLACK);
+	    bBG.setColor(Color.BLACK);
 //	    for (int i = 0; i <= rows; i++) {
 //	    //for (int i = 0; i <= rows; i+=rows) {
 //	      g.drawLine(origin_x, origin_y+i*heightOfRow , width, i * heightOfRow );
@@ -106,13 +121,13 @@ public class GridCanvas extends Canvas {
 	    		
 	    		if(!app_triggered_painting || repaint_all || 
 	    				(cells[i][j] == null || !cells[i][j].equals(color))) {
-	    			g.setColor(color);
-	    			g.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol-1, heightOfRow-1);
+	    			bBG.setColor(color);
+	    			bBG.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol-1, heightOfRow-1);
 	    			cells[i][j] = color;
 	    			trajs[i][j].clear();
 	    			
 	    			if(parent.hasBreakpoint(i, j)) {
-	    				g.drawImage(breakpoint, 
+	    				bBG.drawImage(breakpoint, 
 	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, 
 	    						widthOfCol-1, heightOfRow-1, 
 	    						this);
@@ -123,7 +138,7 @@ public class GridCanvas extends Canvas {
 	    
 	    if(parent.env.options.viewMapPartitions) {
 		    for (Agent seeker : parent.env.getSeekers()) {
-		    	drawPartitions(g, seeker.getID());
+		    	drawPartitions(bBG, seeker.getID());
 			}
 	    }
 	    
@@ -132,9 +147,11 @@ public class GridCanvas extends Canvas {
 //		    	drawMeets(g, seeker.getTrajectory());
 //			}
 		    for (Agent seeker : parent.env.getSeekers()) {
-		    	drawTrajectories(g, seeker.getID());
+		    	drawTrajectories(bBG, seeker.getID());
 			}
 	    }
+	    
+	    graphics.drawImage( backBuffer, 0, 0, this ); 
 	    
 	    app_triggered_painting = false;
 	    repaint_all = true;
@@ -278,6 +295,8 @@ public class GridCanvas extends Canvas {
 				color = Color.GRAY;
 			else if(mask == 2) // visited for Seeker#2
 				color = Color.GRAY;
+			else				// visited by any
+				color = Color.GRAY;
 			break;
 		case FREE:
 			if(mask == 0)	// Unvisited for all
@@ -288,6 +307,8 @@ public class GridCanvas extends Canvas {
 				color = Color.ORANGE;
 			else if(mask == 2) // visited for Seeker#2
 				color = Color.CYAN;
+			else				// visited by any
+				color = Color.WHITE;
 			break;
 		case OCCUP_AGENT:
 			Agent s = parent.env.getSeekerAtCell(cell);
