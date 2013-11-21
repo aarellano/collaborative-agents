@@ -25,23 +25,25 @@ public class Communicator {
 		this.mySeeker = mySeeker;
 	}
 
-	public void commitToSeeker(Agent seekerReceiver) {
-		// 1. Map Info
-		seekerReceiver.receiveMapInfo(localCellsInfo);
-		synchronized (localCellsInfo) {
-			localCellsInfo.clear();
+	public void commitToAgents(Agent[] receivers) {
+		for (Agent receiver : receivers) {
+			
+			if(receiver == mySeeker) continue;
+			
+			// 1. Map Info
+			receiver.receiveMapInfo(localCellsInfo);
+			
+			// 2. Search Info
+			receiver.receiveSearchInfo(localCellsVisited, mySeeker);
+			
+			// 3. Next Destination Info
+//			receiver.receiveNextDestination(mySeeker.getNextDestination());
+//			if(mySeeker.getNextDestination() != null && mySeeker.isVisitedCell(mySeeker.getNextDestination()))
+//				mySeeker.resetNextDestination();
 		}
-		
-		// 2. Search Info
-		seekerReceiver.receiveSearchInfo(localCellsVisited, mySeeker);
-		synchronized (localCellsVisited) {
-			localCellsVisited.clear();
-		}
-		
-		// 3. Next Destination Info
-		seekerReceiver.receiveNextDestination(mySeeker.getNextDestination());
-		if(mySeeker.getNextDestination() != null && mySeeker.isVisitedCell(mySeeker.getNextDestination()))
-			mySeeker.resetNextDestination();
+
+		clearLocalMapInfo();
+		clearLocalSearchInfo();
 	}
 
 	public void addLocalMapInfo(Vector<Point> cells, Vector<EnvCellEnum> values) {

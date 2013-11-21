@@ -47,12 +47,10 @@ public class ControlsToolBar {
 		startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/run.png"));
 		startBtn.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
-	    	  if(startBtn.getSelection()) {
-	    		  startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/terminate.png"));
+	    	  if(screen.env.isGameOver()) {
 	    		  screen.startGameThread();
 	    	  } else {
-	    		  startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/run.png"));
-	    		  screen.stopGameThread();	    		  
+	    		  screen.stopGameThread();
 	    	  }
 	      }
 	    });
@@ -86,7 +84,7 @@ public class ControlsToolBar {
 	        		screen.env.options.loadGameNumber = sleep_trajectories_Slider.getSelection();
 	        		sleep_trajectories_Slider.setToolTipText(screen.env.options.loadGameNumber+"");
 		        	screen.env.loadTrajectories(screen.env.options.loadGameNumber);
-		        	screen.env.screen.redrawAll();
+		        	screen.env.screen.redraw();
 	        	}
 	        }
 	    });   
@@ -135,5 +133,14 @@ public class ControlsToolBar {
 		
 		text = screen.env.clock.getRelativeTimeInClocks()+" / "+(screen.env.clock.getGamesCount()+1)+" Games";
 		calendarLabel.setText(text);
+		updateStatus();
+	}
+	
+	public void updateStatus() {
+  	  if(screen.env.isGameOver()) {
+  		  startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/run.png"));
+  	  } else {
+  		startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/terminate.png"));	    		  
+  	  }
 	}
 }

@@ -14,14 +14,14 @@ public class Main {
 		// Set test parameters
 		String mapName = "rep";
 		//Point[] initialPos = new Point[] {new Point(0, 0)};
-		Point[] initialPos = new Point[] {new Point(0, 0), new Point(20, 20)};
+		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(20, 20)};
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 0), new Point(0, 0)};
 		int strategy = Options.DIAGONAL;
 		CoverageAlgorithmEnum coverageAlgoz = CoverageAlgorithmEnum.CFS;
 		boolean useGUI = true;
 
 		// Initialize the environment
-		//Environment env = new Environment(mapName, initialPos);
+		//Environment env = new Environment(mapName, initialPos, coverageAlgoz);
 		Environment env = new Environment(mapName, 3, coverageAlgoz);
 		env.options.strategy = strategy;
 		env.testName = env.getEnvID()+"/"+
@@ -33,7 +33,10 @@ public class Main {
 		if(useGUI) {
 			env.screen.view(env);
 		} else {
-			
+			env.options.updateView = false;
+			env.screen.env = env;
+			env.screen.startGameThread();
+			while(env.screen.isAlive());
 		}
 	}
 
