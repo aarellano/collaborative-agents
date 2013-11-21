@@ -22,7 +22,7 @@ public class ShortestPathNaive {
 		Vector<Point> trajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, false);
 		if (this.agent.getEnv().options.takeRisk){
 			Vector<Point> alternativeTrajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, true);
-			if (trajectory.size() >= alternativeTrajectory.size()){
+			if (trajectory.size() > alternativeTrajectory.size()){
 				trajectory = alternativeTrajectory;
 				System.out.println("Assumming risks");
 			}
