@@ -191,9 +191,13 @@ public class Environment {
 	public Vector<Point> sightCells(Point center, int distance) {
 		Vector<Point> cells = new Vector<Point>();
 		Vector<Point> buff = map.getCellsWithinDistance(center, distance, options.visionDirection);
+		Point blocker = null;
 		for (Point cell : buff) {
-			if(!map.isSightLineBlocked(center, cell)) 
+			blocker = map.getSightLineBlocker(center, cell);
+			if(blocker == null)
 				cells.add(cell);
+			else
+				cells.add(blocker);
 		}
 		return cells;
 	}

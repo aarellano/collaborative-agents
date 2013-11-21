@@ -18,7 +18,19 @@ public class ShortestPathNaive {
 		this.agent = parent;
 	}
 	
-	public Vector<Point> getPath2NearestUnvisited(Point currentPos, SearchMap currentSearchMap) {
+	public Vector<Point> getCFS(Point currentPos, SearchMap currentSearchMap) {
+		Vector<Point> trajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, false);
+		if (this.agent.getEnv().options.takeRisk){
+			Vector<Point> alternativeTrajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, true);
+			if (trajectory.size() >= alternativeTrajectory.size()){
+				trajectory = alternativeTrajectory;
+				System.out.println("Assumming risks");
+			}
+		}
+		return trajectory;
+	}
+
+	public Vector<Point> getPath2NearestUnvisited(Point currentPos, SearchMap currentSearchMap, boolean risky) {
 		Vector<Point> trajectory = new Vector<Point>();
 		int nRows = this.agent.getMap().getHeight();
 		int nCols = this.agent.getMap().getWidth();
@@ -38,7 +50,11 @@ public class ShortestPathNaive {
 		Point lastPos = null;
 		while (!queue.isEmpty() && !found){
 			lastPos = queue.remove();
-			neighs = getFreeNeighs(lastPos, nRows, nCols);
+			if (risky){
+				neighs = getFreeOrUnknownNeighs(lastPos, nRows, nCols);
+			} else {
+				neighs = getFreeNeighs(lastPos, nRows, nCols);
+			}
 			Iterator<Point> itr = neighs.iterator();
 			while (itr.hasNext() && !found){
 				Point v = (Point) itr.next();
@@ -118,5 +134,29 @@ public class ShortestPathNaive {
 	}
 
 	
+	private Vector<Point> getFreeOrUnknownNeighs(Point pos, int nRows, int nCols){
+		Vector<Point> neighs = new Vector<Point>(4);
+		if ((pos.row-1 >= 0) && ((this.agent.getMap().isFree(pos.row-1,pos.col))
+								|| (this.agent.getMap().isUnknown(pos.row-1,pos.col)))){
+			Point p = new Point(pos.row-1, pos.col);
+			neighs.add(p);
+		}
+		if ((pos.row+1 < nRows) && ((this.agent.getMap().isFree(pos.row+1,pos.col))
+									|| (this.agent.getMap().isUnknown(pos.row+1,pos.col)))){
+			Point p = new Point(pos.row+1, pos.col);
+			neighs.add(p);
+		}
+		if ((pos.col-1 >= 0) && ((this.agent.getMap().isFree(pos.row,pos.col-1))
+								|| (this.agent.getMap().isUnknown(pos.row,pos.col-1)))){
+			Point p = new Point(pos.row, pos.col-1);
+			neighs.add(p);
+		}
+		if ((pos.col+1 < nCols) && ((this.agent.getMap().isFree(pos.row,pos.col+1))
+									|| (this.agent.getMap().isUnknown(pos.row,pos.col+1)))){
+			Point p = new Point(pos.row, pos.col+1);
+			neighs.add(p);
+		}
+		return neighs;
+	}
 
 }

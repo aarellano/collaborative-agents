@@ -3,6 +3,7 @@
  */
 package lib.datastructs;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.eclipse.swt.graphics.ImageData;
@@ -118,6 +119,11 @@ public class Map {
 		return map[row][col] == EnvCellEnum.FREE;
 	}
 	
+	public boolean isUnknown(int row, int col)
+	{
+		return map[row][col] == EnvCellEnum.UNKNOWN;
+	}
+
 	public boolean isValidCell(int row, int col)
 	{
 		return isValidRow(row) && isValidCol(col);
@@ -155,7 +161,7 @@ public class Map {
 		Vector<Point> neighbors = getCellsWithinDistance(p, distance, VisionDirectionEnum.ALL_D);
 		Vector<Point> result = new Vector<Point>();
 		for (Point point : neighbors) {
-			if(getCell(point.row, point.col) == neighborValue  && !isSightLineBlocked(p, point))
+			if(getCell(point.row, point.col) == neighborValue  && getSightLineBlocker(p, point) == null)
 				result.add(point);
 		}
 		return result;
@@ -226,7 +232,7 @@ public class Map {
 		//TODO use good heuristic for d, e.g. average partition length
 		Vector<Point> cells = getCellsWithinDistance(cell, 5, VisionDirectionEnum.ALL_D);
 		for (Point point : cells) {
-			if(!isSightLineBlocked(cell, point)) count++;
+			if(getSightLineBlocker(cell, point) == null) count++;
 		}
 		return count;
 	}
@@ -276,14 +282,17 @@ public class Map {
 		return false;
 	}
 	
-	public boolean isSightLineBlocked(Point from, Point to)
+	public Point getSightLineBlocker(Point from, Point to)
 	{
+		Point blocker = null;
 		Vector<Point> path = Utils.sightLine(from, to);
-		boolean blocked = false;
-		for (Point p : path) {
-			blocked = blocked || isObstacle(p.row, p.col);
+		Iterator<Point> itr = path.iterator();
+		while (itr.hasNext() && (blocker == null)) {
+			Point p = itr.next();
+			if (isObstacle(p.row, p.col))
+				blocker = p;
 		}
-		return blocked;
+		return blocker;
 	}
 	
 	/**

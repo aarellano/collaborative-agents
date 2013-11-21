@@ -15,6 +15,7 @@ public class Options {
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
+	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
 	
 	// Environment settings
 	//======================
