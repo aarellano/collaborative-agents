@@ -12,6 +12,7 @@ import lib.datastructs.Point;
 import views.MainScreen;
 import agent.Agent;
 import agent.AgentStatus;
+import agent.coverage.CoverageAlgorithmEnum;
 
 public class Environment {
 
@@ -33,8 +34,9 @@ public class Environment {
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
 	
-	public void init() {
+	public void init(CoverageAlgorithmEnum coverageAlgoz) {
 		options = new Options();
+		options.coverageAlgorithm = coverageAlgoz;
 		
 		tipInfo = new Hashtable<Point, String>();
 		maxs = new Vector<Point>();
@@ -53,16 +55,16 @@ public class Environment {
 		}
 	}
 	
-	public Environment(String mapID, int agentsCount) {
+	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
 		map = Map.loadMapWithID(mapID);
 		initialPositions = generateRandomPositions(agentsCount);
-		init();
+		init(coverageAlgoz);
 	}
 
-	public Environment(String mapID, Point[] coordinates) {
+	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz) {
 		map = Map.loadMapWithID(mapID);
 		initialPositions = coordinates;
-		init();
+		init(coverageAlgoz);
 	}
 
 	/**
