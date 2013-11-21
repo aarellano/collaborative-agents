@@ -1,6 +1,7 @@
 package environment;
 
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import lib.FileLinesWriter;
@@ -11,13 +12,14 @@ import lib.datastructs.Point;
 import views.MainScreen;
 import agent.Agent;
 import agent.AgentStatus;
+import agent.coverage.CoverageAlgorithmEnum;
 
 public class Environment {
 
 	// Environment variables
 	private Map map;	// Map information
 	public Clock clock;	// Clock
-	private boolean gameover;
+	private boolean gameover = true;
 	public Options options;
 
 	// Agents settings in the environment
@@ -31,12 +33,11 @@ public class Environment {
 
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
-
-	public Environment(String mapID, Point[] coordinates) {
-		map = Map.loadMapWithID(mapID);
+	
+	public void init(CoverageAlgorithmEnum coverageAlgoz) {
 		options = new Options();
-		initialPositions = coordinates;
-
+		options.coverageAlgorithm = coverageAlgoz;
+		
 		tipInfo = new Hashtable<Point, String>();
 		maxs = new Vector<Point>();
 
@@ -52,6 +53,18 @@ public class Environment {
 		if(options.unlimitedVision) {
 			options.Ds = Math.max(getEnvWidth(), getEnvHeight());
 		}
+	}
+	
+	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
+		map = Map.loadMapWithID(mapID);
+		initialPositions = generateRandomPositions(agentsCount);
+		init(coverageAlgoz);
+	}
+
+	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz) {
+		map = Map.loadMapWithID(mapID);
+		initialPositions = coordinates;
+		init(coverageAlgoz);
 	}
 
 	/**
@@ -70,6 +83,20 @@ public class Environment {
 			//seekers[i].loadSearch("visited_2");
 		}
 	}
+	
+	public Point[] generateRandomPositions(int agentsCount) {
+		Point[] positions = new Point[agentsCount];
+		Random rand = new Random(System.currentTimeMillis());
+		for(int i = 0 ; i < agentsCount; i++) {
+			Point p = null;
+			do {
+				p = new Point(rand.nextInt(getEnvHeight()), 
+						rand.nextInt(getEnvWidth()));
+			} while(!map.isFree(p.row, p.col));
+			positions[i] = p;
+		}
+		return positions;
+	}
 
 	/**
 	 * ///////////////////////////////////////////////////////////////////////////
@@ -84,7 +111,7 @@ public class Environment {
 			seeker.prepareGame();
 		}
 
-		if(options.updateView) screen.redrawAll();
+		if(options.updateView) screen.redraw();
 
 		// Place seekers in starting positions
 		for (Agent seeker : agents) {
@@ -104,10 +131,12 @@ public class Environment {
 				clock.incrementClock();
 			}
 
-			checkDebugStatus();
+			checkDebugStatus(agents[turn]);
 
 			agents[turn].takeATurn();
+			System.out.println(clock.getRelativeTimeInClocks());
 		}
+		updateGameView();
 
 		// Game Concluded
 		System.out.println("Game took " + clock.getRelativeTimeInClocks() + " turns!");
@@ -129,9 +158,9 @@ public class Environment {
 	}
 
 	public void broadcast() {
-		for (Agent seeker : agents) {
-			//seeker.stopSeeking();
-		}
+//		for (Agent seeker : agents) {
+//			//seeker.stopSeeking();
+//		}
 		gameover = true;
 	}
 
@@ -152,7 +181,8 @@ public class Environment {
 	public EnvCellEnum readSensorsForCell(Point cell) {
 		EnvCellEnum value = map.getCell(cell.row, cell.col);
 		for (Agent seeker : agents) {
-			if(seeker.getStatus() != null && seeker.getStatus().coordinates.equals(cell)) {
+			AgentStatus status = seeker.getStatus();
+			if(status != null && status.coordinates.equals(cell)) {
 				value = EnvCellEnum.OCCUP_AGENT;
 				break;
 			}
@@ -174,7 +204,7 @@ public class Environment {
 		return cells;
 	}
 
-	private boolean isGameOver() {		
+	public boolean isGameOver() {		
 		return gameover || 
 				(options.terminateOnTimeout && clock.getRelativeTimeInClocks() > 1000);
 	}
@@ -193,17 +223,19 @@ public class Environment {
 		int mask = 0;
 		for (int i = 0; i < agents.length; i++) {
 			Agent seeker = agents[i];
-			if(seeker.isScannedCell(p))
+			if(seeker.isVisitedCell(p))
 				mask += Math.pow(2, i);
 		}
 		return mask;
 	}
 
+	int maxMask = -1;
 	public int getMaxSharedMask() {
-		int mask = 0;
+		if (maxMask != -1) return maxMask;
+		maxMask = 0;
 		for(int i = 0; i < agents.length; i++)
-			mask += Math.pow(2, i);
-		return mask;
+			maxMask += Math.pow(2, i);
+		return maxMask;
 	}
 
 	public boolean isDestinatedCell(Point p) {
@@ -214,15 +246,40 @@ public class Environment {
 		return false;
 	}
 
-	private void checkDebugStatus() {
+	private void checkDebugStatus(Agent agent) {
+		if(screen.hasBreakpoint(agent.getStatus().coordinates.row,
+				agent.getStatus().coordinates.col)) {
+			options.suspendGame = true;
+			// TODO update debug buttons
+		}
+		
 		if(options.debugMode && options.stepOverGame) {
 			options.suspendGame = true;
 			options.stepOverGame = false;
+			updateGameView();
 		}
-		while(options.debugMode && options.suspendGame);
+		if(options.debugMode && options.suspendGame) {
+			suspendThread();			
+		}
 		if(options.debugMode && options.terminateGame) {
 			options.terminateGame = false;
 			gameover = true;
+		}
+	}
+	
+	public void suspendThread() {
+		synchronized (this) {
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void resumeThread() {
+		synchronized (this) {
+			this.notify();
 		}
 	}
 
@@ -402,7 +459,7 @@ public class Environment {
 				System.out.print("=");
 			System.out.print("\n");
 		}
-		screen.redrawChanges();
+		screen.redraw();
 		screen.updateView();
 
 		try {

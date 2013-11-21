@@ -11,6 +11,7 @@ import lib.datastructs.VisitedStatusEnum;
 import org.junit.Before;
 import org.junit.Test;
 
+import agent.coverage.CoverageAlgorithmEnum;
 import environment.Environment;
 
 public class ShortestPathNaiveTest {
@@ -23,7 +24,7 @@ public class ShortestPathNaiveTest {
 		Point coords = new Point(2, 1);
 		AgentStatus status = new AgentStatus(coords, OrientationEnum.NORTH);
 		Point[] coordinates = {coords};
-		Environment env = new Environment("rep", coordinates);
+		Environment env = new Environment("rep", coordinates, CoverageAlgorithmEnum.CFS);
 		Agent agent = new Agent(0, status, env);
 		VisitedStatusEnum[][] currentStatus = {{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED, VisitedStatusEnum.VISITED},
 											{VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.UNVISITED, VisitedStatusEnum.VISITED},

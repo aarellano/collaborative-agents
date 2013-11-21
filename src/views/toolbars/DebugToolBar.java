@@ -51,6 +51,7 @@ public class DebugToolBar {
 		resumeBtn.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  screen.env.options.suspendGame = false;
+	    	  screen.env.resumeThread();
 	    	  updateStatus();
 	      }
 	    });
@@ -73,6 +74,8 @@ public class DebugToolBar {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  screen.env.options.suspendGame = false;
 	    	  screen.env.options.stepOverGame = true;
+	    	  screen.env.resumeThread();
+	    	  updateStatus();
 	      }
 	    });
 		
@@ -83,7 +86,10 @@ public class DebugToolBar {
 	      public void widgetSelected(SelectionEvent event) {
 	    	  screen.env.options.suspendGame = false;
 	    	  screen.env.options.terminateGame = true;
+	    	  screen.env.resumeThread();
 	    	  screen.stopGameThread();
+	    	  screen.updateView();
+	    	  updateStatus();
 	      }
 	    });
 		
@@ -96,23 +102,9 @@ public class DebugToolBar {
 				if(breakPointsList.contains(cell)) {
 					breakPointsList.remove(cell);
 				} else {
-					breakPointsList.add(cell);
-//					final int index = breakPointsList.indexOf(cell);
-//					Display.getDefault().syncExec( new Runnable() {  public void run() { 
-//						final Button brkpt = new Button(screen.getShell(), SWT.PUSH);
-//						brkpt.setBounds(e.getX(), e.getY(), 200, 200);
-//						brkpt.setImage(new Image(parent.getDisplay(), "res/imgs/break.png"));
-//						breakPointBtnsList.insertElementAt(brkpt, index);
-//						brkpt.addSelectionListener(new SelectionAdapter() {
-//						      public void widgetSelected(SelectionEvent event) {
-//						    	  breakPointsList.remove(index);
-//						    	  breakPointBtnsList.remove(index);
-//						    	  brkpt.dispose();
-//						      }
-//						    });
-//					} });
+					breakPointsList.add(new Point(cell.row, cell.col));
 				}
-				screen.redrawAll();
+				screen.redraw();
 			}};
 		breakPointBtn.addSelectionListener(new SelectionAdapter() {
 	      public void widgetSelected(SelectionEvent event) {

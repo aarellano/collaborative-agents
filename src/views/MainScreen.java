@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Shell;
 import views.toolbars.ControlsToolBar;
 import views.toolbars.DebugToolBar;
 import views.toolbars.OptionsView;
-
 import environment.EnvCellEnum;
 import environment.Environment;
 
@@ -197,12 +196,8 @@ public class MainScreen implements Runnable {
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
 	
-	public void redrawAll() {
-		grid.redrawAll();
-	}
-	
-	public void redrawChanges() {
-		grid.redrawChanges();
+	public void redraw() {
+		grid.redraw();
 	}
 	
 	public void updateView() {
@@ -219,10 +214,6 @@ public class MainScreen implements Runnable {
 			optionsView.view(env);
 		else
 			optionsView.closeView();
-	}
-	
-	public void flushRedrawUpdates() {
-		grid.cancelRedrawUpdates();
 	}
 	
 	/**

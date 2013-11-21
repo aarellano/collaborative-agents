@@ -6,43 +6,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import lib.datastructs.OrientationEnum;
 import lib.datastructs.Point;
-import lib.datastructs.TwoPoints;
 import agent.Agent;
 import environment.EnvCellEnum;
 
 public class GridCanvas extends Canvas {
-
-	public class TrajInfo {
-		public Color color;
-		public TwoPoints line;
-		public Stroke stroke;
-		public TrajInfo(Color color, TwoPoints line, Stroke stroke) {
-			super();
-			this.color = color;
-			this.line = line;
-			this.stroke = stroke;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			TrajInfo other = (TrajInfo) obj;
-			return color.equals(other.color) && line.equals(other.line) && 
-					stroke.equals(other.stroke);
-		}
-	}
 	
 	/**
 	 * 
@@ -50,15 +22,10 @@ public class GridCanvas extends Canvas {
 	private static final long serialVersionUID = -7241381545906291018L;
 	private int rows, columns;
 	private MainScreen parent;
-	private Color[][] cells;
-	private Vector<TrajInfo>[][] trajs;
 	public int origin_x, origin_y;
-	private boolean app_triggered_painting = false;
-	private boolean repaint_all = true;
-	private boolean cancelRedrawUpdates;
-	private Color[] seekers = {Color.BLUE, Color.RED, Color.BLUE};
+	private Color[] agentColors;
 	
-	private Image breakpoint = Toolkit.getDefaultToolkit().getImage("break.png");
+	//private Image breakpoint = Toolkit.getDefaultToolkit().getImage("break.png");
 	
 	public GridCanvas(int rows, int columns, MainScreen parent) {
 		super();
@@ -66,25 +33,35 @@ public class GridCanvas extends Canvas {
 		this.columns = columns;
 		this.parent = parent;
 		origin_x = origin_y = 0;
-		cells = new Color[rows][columns];
-		trajs= new Vector[rows][columns];
-		for(int i = 0; i < rows; i++)
-			for(int j = 0; j < columns; j++)
-				trajs[i][j] = new Vector<TrajInfo>();
 		
 		new ToolTip("", this, parent);
 	}
 
+	Image backBuffer; 
+	Graphics bBG; 
 	@Override
-	public void paint(Graphics g) {
-//		if(!app_triggered_painting)
-//			super.paint(g);
+	public void paint(Graphics graphics) {
+		
+		// Double buffering to avoid redraw flickering
+//		if( backBuffer == null )  {  
+			backBuffer = createImage( getWidth(), getHeight() );  
+			bBG = backBuffer.getGraphics();  
+			//bBG.setColor(Color.black);
+			//bBG.fillRect(0, 0, getWidth(), getHeight());
+//		}  
+		
+		if(agentColors == null) {
+			agentColors = new Color[parent.env.getSeekers().length];
+			for(int i = 0 ; i < agentColors.length; i++) {
+				agentColors[i] = colors[i%colors.length];
+			}
+		}
 		
 		int width = getSize().width, height = getSize().height;
 	    int heightOfRow = height / rows;
 	    int widthOfCol = width / columns;
 	    
-	    g.setColor(Color.BLACK);
+	    bBG.setColor(Color.BLACK);
 //	    for (int i = 0; i <= rows; i++) {
 //	    //for (int i = 0; i <= rows; i+=rows) {
 //	      g.drawLine(origin_x, origin_y+i*heightOfRow , width, i * heightOfRow );
@@ -104,26 +81,23 @@ public class GridCanvas extends Canvas {
 	    		else if(parent.env.options.viewVisitedCells)
 	    			color = getColorForSearch(i, j);
 	    		
-	    		if(!app_triggered_painting || repaint_all || 
-	    				(cells[i][j] == null || !cells[i][j].equals(color))) {
-	    			g.setColor(color);
-	    			g.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol-1, heightOfRow-1);
-	    			cells[i][j] = color;
-	    			trajs[i][j].clear();
+	    			bBG.setColor(color);
+	    			bBG.fillRect(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol-1, heightOfRow-1);
 	    			
 	    			if(parent.hasBreakpoint(i, j)) {
-	    				g.drawImage(breakpoint, 
-	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, 
-	    						widthOfCol-1, heightOfRow-1, 
-	    						this);
+	    				bBG.setColor(Color.CYAN);
+		    			bBG.fillOval(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol/2, heightOfRow/2);
+//	    				bBG.drawImage(breakpoint, 
+//	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, 
+//	    						widthOfCol-1, heightOfRow-1, 
+//	    						this);
 	    			}
-	    		}
 	    	}
 	    }
 	    
 	    if(parent.env.options.viewMapPartitions) {
 		    for (Agent seeker : parent.env.getSeekers()) {
-		    	drawPartitions(g, seeker.getID());
+		    	drawPartitions(bBG, seeker.getID());
 			}
 	    }
 	    
@@ -132,137 +106,31 @@ public class GridCanvas extends Canvas {
 //		    	drawMeets(g, seeker.getTrajectory());
 //			}
 		    for (Agent seeker : parent.env.getSeekers()) {
-		    	drawTrajectories(g, seeker.getID());
+		    	drawTrajectories(bBG, seeker.getID());
 			}
 	    }
 	    
-	    app_triggered_painting = false;
-	    repaint_all = true;
-	    cancelRedrawUpdates = false;
+	    graphics.drawImage( backBuffer, 0, 0, this ); 
+	    
 	}
 
 	@Override
 	public void update(Graphics g) {
-		app_triggered_painting = true;
-		//repaint_all = false;
 		paint(g);
 	}
 	
-	public void redrawChanges() {
-		repaint_all = false;
+	public void redraw() {
 		repaint();
-	}
-	
-	public void redrawAll() {
-		repaint_all = true;
-		repaint();
-	}
-
-	public void cancelRedrawUpdates() {
-		cancelRedrawUpdates = true;
 	}
 	
 	private Color getColorForMap(int i, int j) {
 		Point p = new Point(i, j);
 		return getColor(p, parent.getCell(i, j), parent.env.getCellSharedMaskForMap(p));
-//		if(cells[i][j] == Color.MAGENTA) 
-//			return Color.MAGENTA;
-//		
-//		Color color = null;
-//	    EnvCellEnum cell;
-//	    int mask = 0, maxMask = parent.env.getMaxSharedMask();
-//		cell = parent.getCell(i, j);
-//		mask = parent.env.getCellSharedMask(new Point(i, j));
-//		switch (cell) {
-//		case BLOCKED:
-//			if(mask == 0)	// Unknown for all
-//				color = Color.DARK_GRAY;
-//			else if(mask == maxMask) // Known for all
-//				color = Color.BLACK;
-//			else if(mask == 1) // Known for Seeker#1
-//				color = Color.GRAY;
-//			else if(mask == 2) // Known for Seeker#2
-//				color = Color.GRAY;
-//			break;
-//		case FREE:
-//			if(mask == 0)	// Unknown for all
-//				color = Color.LIGHT_GRAY;
-//			else if(mask == maxMask) // Known for all
-//				color = Color.WHITE;
-//			else if(mask == 1) // Known for Seeker#1
-//				color = Color.ORANGE;
-//			else if(mask == 2) // Known for Seeker#2
-//				color = Color.CYAN;
-//			break;
-//		case OCCUP_HIDER:
-//			color = Color.GREEN;
-//			break;
-//		case OCCUP_SEEKER:
-//			color = seekers[parent.env.getSeekerAtCell(new Point(i, j)).getID()-1];
-//			break;
-//		default:
-//			break;
-//		}
-//
-//		boolean isMax = parent.env.maxs.contains(new Point(i,j));
-//		boolean isDestined = parent.env.isDestinatedCell(new Point(i, j));
-//		if(isMax && isDestined)
-//			color = Color.PINK;
-//		else if(isMax)
-//			color = Color.RED;
-//		else if(isDestined)
-//			color = Color.YELLOW;
-//		return color;
 	}
 	
 	private Color getColorForSearch(int i, int j) {
 		Point p = new Point(i, j);
 		return getColor(p, parent.getCell(i, j), parent.env.getCellSharedMaskForSearch(p));
-//		Color color = null;
-//	    EnvCellEnum cell;
-//	    int mask = 0, maxMask = parent.env.getMaxSharedMask();
-//		cell = parent.getCell(i, j);
-//		mask = parent.env.getCellScannedSharedMask(new Point(i, j));
-//		switch (cell) {
-//		case BLOCKED:
-//			if(mask == 0)	// Unknown for all
-//				color = Color.DARK_GRAY;
-//			else if(mask == maxMask) // Known for all
-//				color = Color.BLACK;
-//			else if(mask == 1) // Known for Seeker#1
-//				color = Color.GRAY;
-//			else if(mask == 2) // Known for Seeker#2
-//				color = Color.GRAY;
-//			break;
-//		case FREE:
-//			if(mask == 0)	// Unknown for all
-//				color = Color.LIGHT_GRAY;
-//			else if(mask == maxMask) // Known for all
-//				color = Color.WHITE;
-//			else if(mask == 1) // Known for Seeker#1
-//				color = Color.ORANGE;
-//			else if(mask == 2) // Known for Seeker#2
-//				color = Color.CYAN;
-//			break;
-//		case OCCUP_HIDER:
-//			color = Color.GREEN;
-//			break;
-//		case OCCUP_SEEKER:
-//			color = seekers[parent.env.getSeekerAtCell(new Point(i, j)).getID()-1];
-//			break;
-//		default:
-//			break;
-//		}
-//		
-//		boolean isMax = parent.env.maxs.contains(new Point(i,j));
-//		boolean isDestined = parent.env.isDestinatedCell(new Point(i, j));
-//		if(isMax && isDestined)
-//			color = Color.PINK;
-//		else if(isMax)
-//			color = Color.RED;
-//		else if(isDestined)
-//			color = Color.YELLOW;
-//		return color;
 	}
 	
 	private Color getColor(Point cell, EnvCellEnum value, int mask) {
@@ -274,9 +142,11 @@ public class GridCanvas extends Canvas {
 				color = Color.DARK_GRAY;
 			else if(mask == maxMask) // visited for all
 				color = Color.BLACK;
-			else if(mask == 1) // visited for Seeker#1
-				color = Color.GRAY;
-			else if(mask == 2) // visited for Seeker#2
+//			else if(mask == 1) // visited for Seeker#1
+//				color = Color.GRAY;
+//			else if(mask == 2) // visited for Seeker#2
+//				color = Color.GRAY;
+			else				// visited by any
 				color = Color.GRAY;
 			break;
 		case FREE:
@@ -284,14 +154,16 @@ public class GridCanvas extends Canvas {
 				color = Color.LIGHT_GRAY;
 			else if(mask == maxMask) // visited for all
 				color = Color.WHITE;
-			else if(mask == 1) // visited for Seeker#1
-				color = Color.ORANGE;
-			else if(mask == 2) // visited for Seeker#2
-				color = Color.CYAN;
+//			else if(mask == 1) // visited for Seeker#1
+//				color = Color.ORANGE;
+//			else if(mask == 2) // visited for Seeker#2
+//				color = Color.CYAN;
+			else				// visited by any
+				color = Color.GRAY;
 			break;
 		case OCCUP_AGENT:
 			Agent s = parent.env.getSeekerAtCell(cell);
-			color = (s == null) ? Color.BLUE : seekers[s.getID()-1];
+			color = (s == null) ? Color.BLUE : agentColors[s.getID()-1];
 			break;
 		default:
 			break;
@@ -321,9 +193,8 @@ public class GridCanvas extends Canvas {
 		Point current;
 		g.setColor(color);
 		current = traj.get(0);
-		for(int i = 1; i < traj.size() && !cancelRedrawUpdates; i++) {
-			if(meets.contains(i-1) && cells[current.row][current.col] != color) {
-				//cells[current.row][current.col] = color;
+		for(int i = 1; i < traj.size(); i++) {
+			if(meets.contains(i-1)) {
 				g.fillRect(origin_x+current.col*widthOfCol+1, origin_y+current.row*heightOfRow+1,
 						widthOfCol-1, heightOfRow-1);
 			}
@@ -353,14 +224,16 @@ public class GridCanvas extends Canvas {
 		Graphics2D g2d = (Graphics2D)g;
 		
 	    g2d.setStroke(new BasicStroke(4));
-		Point current, next;
+		Point current, next, previous;
 		org.eclipse.swt.graphics.Point p_old = null, p1 = null, p2 = null;
 		int x, y;
 		
 		current = traj.get(0);
+		previous = current;
+		
 		p_old = new org.eclipse.swt.graphics.Point(current.col*widthOfCol+widthOfCol/2, 
 				current.row*heightOfRow+heightOfRow/2);
-		for(int i = 1; i < traj.size() && !cancelRedrawUpdates; i++) {
+		for(int i = 1; i < traj.size(); i++) {
 			next = traj.get(i);
 			
 			// Don't draw extra useless work at the end of the episode
@@ -409,36 +282,38 @@ public class GridCanvas extends Canvas {
 				break;
 			}
 			
-			Color color = Color.DARK_GRAY;
-			if(!isDuplicated(current, next, seeker)) {
-				color = seekers[id-1];
-				if(id == 1) g2d.setStroke(dashed);
-				else g2d.setStroke(dotted);
-			} else
-				g2d.setStroke(solid);
-			g.setColor(color);
-
-			TwoPoints line = new TwoPoints(new Point(p_old.x, p_old.y),
-					new Point(p1.x, p1.y));
-			TrajInfo info = new TrajInfo(color, line, g2d.getStroke());
-			if(!trajs[current.row][current.col].contains(info)) {
-				g.drawLine(p_old.x, p_old.y, p1.x, p1.y);
-				trajs[current.row][current.col].add(info);
-			}
+//			Color color = Color.DARK_GRAY;
+//			if(!isDuplicated(current, next, seeker)) {
+//				color = agentColors[id-1];
+//				if(id == 1) g2d.setStroke(dashed);
+//				else g2d.setStroke(dotted);
+//			} else
+//				g2d.setStroke(solid);
+//			g.setColor(color);
 			
-			line = new TwoPoints(new Point(p1.x, p1.y),	new Point(p2.x, p2.y));
-			info = new TrajInfo(color, line, g2d.getStroke());
-			if(!trajs[current.row][current.col].contains(info)) {
-				g.drawLine(p1.x, p1.y, p2.x, p2.y);
-				trajs[current.row][current.col].add(info);
-			}
-//			g.drawLine(current.col*widthdOfCol+widthdOfCol/2, 
-//					current.row*heightOfRow+heightOfRow/4, 
-//					next.col*widthdOfCol+widthdOfCol/2, 
-//					next.row*heightOfRow+heightOfRow/4);
+			setTrajectoryStroke(g, previous, current, seeker);
+			g.drawLine(p_old.x, p_old.y, p1.x, p1.y);
+
+			setTrajectoryStroke(g, current, next, seeker);
+			g.drawLine(p1.x, p1.y, p2.x, p2.y);;
+				
 			p_old = new org.eclipse.swt.graphics.Point(p2.x, p2.y);
+			previous = current;
 			current = next;
 		}
+	}
+	
+	private void setTrajectoryStroke(Graphics g, Point current, Point next, Agent agent) {
+		Graphics2D g2d = (Graphics2D)g;
+		int id = agent.getID();
+		Color color = Color.DARK_GRAY;
+		if(true || !isDuplicated(current, next, agent)) {
+			color = agentColors[id-1];
+			if(id == 1) g2d.setStroke(dashed);
+			else g2d.setStroke(dotted);
+		} else
+			g2d.setStroke(solid);
+		g2d.setColor(color);
 	}
 
 //	Color[] colors = {Color.LIGHT_GRAY};

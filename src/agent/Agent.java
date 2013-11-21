@@ -155,22 +155,11 @@ public class Agent {
 				if(neighbour != this) neighbors.add(neighbour);
 			}
 			mapBuilder.getMap().setCell(cell.row, cell.col, v);
-			
-			if(!isVisitedCell(cell)) {
-				searcher.scanCell(cell.row, cell.col);
-			}
 		}
 		
-		if (env.options.fullCommunication) {
-			Agent[] agents = env.getSeekers();
-			for (Agent agent : agents) {
-				if(!neighbors.contains(agent)) neighbors.add(agent);
-			}
-		}
 		// Share news with neighbors
-		for (Agent neighbour : neighbors) {
-			this.commitToSeeker(neighbour);
-			neighbour.commitToSeeker(this);
+		if (env.options.fullCommunication) {
+			this.commit();
 		}
 		
 		// Update components
@@ -248,9 +237,10 @@ public class Agent {
 	 * @category Communication Actions
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
-
-	public void commitToSeeker(Agent seeker) {
-		communicator.commitToSeeker(seeker);
+	
+	public void commit() {
+		
+		communicator.commitToAgents(env.getSeekers());
 		env.clock.addTimeStamp();
 	}
 	
@@ -265,8 +255,8 @@ public class Agent {
 
 	public void receiveSearchInfo(Vector<Point> cells, Agent sender) {
 		for (Point cell : cells) {
-			if(sender.isVisitedCell(cell)) searcher.visitCell(cell.row, cell.col);
-			else searcher.scanCell(cell.row, cell.col);
+			if(sender.isVisitedCell(cell)) 
+				searcher.visitCell(cell.row, cell.col);
 		}
 	}
 	
@@ -468,10 +458,6 @@ public class Agent {
 	
 	public boolean isVisitedCell(Point cell) {
 		return searcher.isVisitedCell(cell.row, cell.col);
-	}
-	
-	public boolean isScannedCell(Point cell) {
-		return searcher.isScannedCell(cell.row, cell.col);
 	}
 	
 	public boolean isStartingCell(Point cell) {

@@ -62,7 +62,7 @@ public class SearchMap {
 			EnvCellEnum cellValue = seeker.getMap().getCell(cell.row, cell.col);
 			if(!(cellValue == EnvCellEnum.BLOCKED || cellValue == EnvCellEnum.UNKNOWN 
 					|| cell.equals(status.coordinates) || 
-					seeker.isScannedCell(cell))) {
+					seeker.isVisitedCell(cell))) {
 				//value = getNeighborsWithVisited(cell, false).size();
 				value = 1.0;
 			}
@@ -86,18 +86,9 @@ public class SearchMap {
 		}
 		return result;
 	}
-
-	public void scanCell(int row, int col) {
-		visited[row][col] = VisitedStatusEnum.SCANNED;
-	}
 	
 	public void visitCell(int row, int col) {
 		visited[row][col] = VisitedStatusEnum.VISITED;
-	}
-	
-	public boolean isScannedCell(int row, int col) {
-		return visited[row][col] == VisitedStatusEnum.SCANNED || 
-				visited[row][col] == VisitedStatusEnum.VISITED;
 	}
 	
 	public boolean isVisitedCell(int row, int col) {

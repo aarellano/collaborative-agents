@@ -77,7 +77,7 @@ public class Path {
 		OrientationEnum orientation = status.orientation;
 		
 		Point currentPos = this.source;
-		Iterator itr = pathCells.iterator();
+		Iterator<Point> itr = pathCells.iterator();
 		
 		while(itr.hasNext()){
 			Point nextPos = (Point) itr.next();
