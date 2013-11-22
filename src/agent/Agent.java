@@ -17,6 +17,7 @@ import lib.datastructs.PointValue;
 import lib.datastructs.PointValueComparator;
 import agent.coverage.CFSAlgorithm;
 import agent.coverage.CoverageAlgorithm;
+import agent.coverage.GSAlgorithm;
 import agent.coverage.OldSearchAlgorithm;
 import environment.EnvCellEnum;
 import environment.Environment;
@@ -63,7 +64,7 @@ public class Agent {
 			coverageAlgorithm = new CFSAlgorithm();
 			break;
 		case GS:
-			// create GFS algorithm class
+			coverageAlgorithm = new GSAlgorithm();
 			break;
 		default:
 			break;

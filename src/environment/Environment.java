@@ -204,6 +204,52 @@ public class Environment {
 		return cells;
 	}
 
+	/**
+	 * Computes the visible cells in each direction based on the robot's current position.
+	 * @param currentPoint the current position of the agent
+	 * @param d the distance limit to look for visibility
+	 * @return the visible cells in each direction
+	 */
+	public Vector<Vector<Point>> getVisibility(Point currentPoint, int d, Map map) {
+		Vector<Vector<Point>> vis = new Vector<Vector<Point>>();
+
+		Point point;
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col, row = currentPoint.row - 1; row >= 0; row--) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(0).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col, row = currentPoint.row + 1; row < map.getHeight(); row++) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(1).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for(int col = currentPoint.col + 1, row = currentPoint.row; col < map.getWidth(); col++) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(2).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col - 1, row = currentPoint.row; col >= 0; col--) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(3).add(point);
+		}
+
+		return vis;
+	}
+
 	public boolean isGameOver() {
 		return gameover ||
 				(options.terminateOnTimeout && clock.getRelativeTimeInClocks() > 1000);
