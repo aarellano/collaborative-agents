@@ -4,7 +4,7 @@ public class Range {
 
 	public int from, to;
 	public int weight;
-		
+
 	public Range(int from, int to) {
 		super();
 		this.from = from;

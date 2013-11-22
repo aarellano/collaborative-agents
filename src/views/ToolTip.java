@@ -1,8 +1,16 @@
 package views;
 
-import java.awt.*;
-import java.applet.*;
-import java.awt.event.*;
+import java.applet.Applet;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FontMetrics;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.LayoutManager;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import lib.datastructs.Point;
 
@@ -13,27 +21,28 @@ public class ToolTip extends Canvas {
 	 */
 	private static final long serialVersionUID = 1L;
 	private MainScreen screen;
-	
+
 	protected String tip;
 	protected Component owner;
-	
+
 	private Container mainContainer;
 	private LayoutManager mainLayout;
-	
+
 	private boolean shown;
-	
+
 	private final int VERTICAL_OFFSET = 30;
 	private final int HORIZONTAL_ENLARGE = 10;
-	
-    public ToolTip(String tip, Component owner, MainScreen screen) {
-    	this.tip = tip;
+
+	public ToolTip(String tip, Component owner, MainScreen screen) {
+		this.tip = tip;
 		this.owner = owner;
 		this.screen = screen;
-    	owner.addMouseListener(new MAdapter());
-   		setBackground(new Color(255,255,220));
-    }
+		owner.addMouseListener(new MAdapter());
+		setBackground(new Color(255,255,220));
+	}
 
 
+	@Override
 	public void paint(Graphics g) {
 		g.drawRect(0,0,getSize().width -1, getSize().height -1);
 		g.drawString(tip, 3, getSize().height - 3);
@@ -41,20 +50,20 @@ public class ToolTip extends Canvas {
 
 	private void addToolTip(int xPos, int yPos) {
 		mainContainer.setLayout(null);
-		
-		FontMetrics fm = getFontMetrics(owner.getFont());    		
+
+		FontMetrics fm = getFontMetrics(owner.getFont());
 		setSize(fm.stringWidth(tip) + HORIZONTAL_ENLARGE, fm.getHeight());
 
-//		setLocation((owner.getLocationOnScreen().x - mainContainer.getLocationOnScreen().x) , 
-//					(owner.getLocationOnScreen().y - mainContainer.getLocationOnScreen().y + VERTICAL_OFFSET));
-		setLocation((owner.getLocationOnScreen().x - mainContainer.getLocationOnScreen().x + xPos), 
-				  (owner.getLocationOnScreen().y - mainContainer.getLocationOnScreen().y + yPos + VERTICAL_OFFSET));
+		//		setLocation((owner.getLocationOnScreen().x - mainContainer.getLocationOnScreen().x) ,
+		//					(owner.getLocationOnScreen().y - mainContainer.getLocationOnScreen().y + VERTICAL_OFFSET));
+		setLocation((owner.getLocationOnScreen().x - mainContainer.getLocationOnScreen().x + xPos),
+				(owner.getLocationOnScreen().y - mainContainer.getLocationOnScreen().y + yPos + VERTICAL_OFFSET));
 
-		// correction, whole tool tip must be visible 
+		// correction, whole tool tip must be visible
 		if (mainContainer.getSize().width < ( getLocation().x + getSize().width )) {
 			setLocation(mainContainer.getSize().width - getSize().width, getLocation().y);
 		}
-		
+
 		setVisible(false);
 		mainContainer.add(this, 0);
 		setVisible(true);
@@ -63,7 +72,7 @@ public class ToolTip extends Canvas {
 		shown = true;
 	}
 
-	
+
 	private void removeToolTip() {
 		if (shown) {
 			mainContainer.remove(0);
@@ -78,25 +87,25 @@ public class ToolTip extends Canvas {
 		while (true) {
 			if ((parent instanceof Applet) || (parent instanceof Frame)) {
 				mainContainer = parent;
-				break;				
+				break;
 			} else {
 				parent = parent.getParent();
 			}
-		}		
+		}
 		mainLayout = mainContainer.getLayout();
 	}
 
-    class MAdapter extends MouseAdapter {
-    	    	
+	class MAdapter extends MouseAdapter {
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if(!screen.env.options.debugMode) return;
-			
+
 			findMainContainer();
 			Point cell = screen.getGridCanvas().getCellOfEvent(e);
 			tip = screen.env.tipInfo.get(cell);
 			if(tip == null) tip = "";
-		    addToolTip(e.getX(), e.getY());
+			addToolTip(e.getX(), e.getY());
 		}
 
 		@Override
@@ -108,6 +117,6 @@ public class ToolTip extends Canvas {
 		public void mouseExited(MouseEvent arg0) {
 			removeToolTip();
 		}
-		
+
 	}
 }

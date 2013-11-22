@@ -15,13 +15,13 @@ public class AgentStatus {
 
 	public Point coordinates;
 	public OrientationEnum orientation;
-	
+
 	public AgentStatus(Point coordinates, OrientationEnum orientation) {
 		super();
 		this.coordinates = coordinates;
 		this.orientation = orientation;
 	}
-	
+
 	public AgentStatus(int row, int col, OrientationEnum orientation) {
 		super();
 		this.coordinates = new Point(row, col);
@@ -36,6 +36,6 @@ public class AgentStatus {
 	@Override
 	protected Object clone() {
 		return new AgentStatus(coordinates.row, coordinates.col, orientation);
-	}	
-		
+	}
+
 }

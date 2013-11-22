@@ -10,12 +10,12 @@ import lib.datastructs.PointValue;
 import lib.datastructs.PointValueCollections;
 
 public class Utils {
-	
+
 	static Random rand = new Random(System.currentTimeMillis());
-	
+
 	public static int selectByRoulette(Collection<Double> weights, double minWeight) {
-	    Vector<Double> roulette = new Vector<Double>();
-	    double sum = 0, v;
+		Vector<Double> roulette = new Vector<Double>();
+		double sum = 0, v;
 		int size = weights.size();
 		double max_value = maxOfList(weights);
 		for (Double w : weights) {
@@ -27,23 +27,23 @@ public class Utils {
 				v = w/max_value;
 			roulette.add(v);
 			sum += v;
-	    }
+		}
 
-	    int selector = rand.nextInt(100), selected = 0;
+		int selector = rand.nextInt(100), selected = 0;
 		float buf = 0;
-	    for(int k = 0; k < size; k++)
-	    {
-	        double norm = (roulette.get(k)*100/sum);
-	        if(selector < norm + buf)
-	        {
-	            selected = k;
-	            break;
-	        }
-	        buf += norm;
-	    }
+		for(int k = 0; k < size; k++)
+		{
+			double norm = (roulette.get(k)*100/sum);
+			if(selector < norm + buf)
+			{
+				selected = k;
+				break;
+			}
+			buf += norm;
+		}
 		return selected;
 	}
-	
+
 	public static int selectByMax(Collection<Double> weights, double minWeight) {
 		int selected = 0;
 		Vector<Integer> maxs = maxsOfList(weights);
@@ -51,7 +51,7 @@ public class Utils {
 		selected = maxs.size()-1;
 		return maxs.get(selected);
 	}
-	
+
 	public static Double maxOfList(Collection<Double> list) {
 		Double max = 0.0;
 		for (Double object : list) {
@@ -59,7 +59,7 @@ public class Utils {
 		}
 		return max;
 	}
-	
+
 	public static Vector<Integer> maxsOfList(Collection<Double> list) {
 		int i = 0;
 		double max = maxOfList(list);
@@ -71,7 +71,7 @@ public class Utils {
 		}
 		return maxs;
 	}
-	
+
 	public static Double minOfList(Collection<Double> list) {
 		Double min = Double.MAX_VALUE;
 		for (Double object : list) {
@@ -91,11 +91,11 @@ public class Utils {
 		}
 		return mins;
 	}
-	
+
 	// Bresenham's line drawing algorithm
 	public static Vector<Point> sightLine(Point from, Point to) {
 		Vector<Point> points = new Vector<Point>();
-		
+
 		// Bresenham's line drawing algorithm
 		int x = from.col, x2 = to.col;
 		int y = from.row, y2 = to.row;
@@ -111,30 +111,30 @@ public class Utils {
 			longest = Math.abs(h) ;
 			shortest = Math.abs(w) ;
 			if (h<0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
-			dx2 = 0 ;            
+			dx2 = 0 ;
 		}
 		int numerator = longest >> 1 ;
-		for (int i=0;i<=longest;i++) {
-			points.add(new Point(y, x));
-			numerator += shortest ;
-			if (!(numerator<longest)) {
-				numerator -= longest ;
-				x += dx1 ;
-				y += dy1 ;
-			} else {
-				x += dx2 ;
-				y += dy2 ;
+			for (int i=0;i<=longest;i++) {
+				points.add(new Point(y, x));
+				numerator += shortest ;
+				if (!(numerator<longest)) {
+					numerator -= longest ;
+					x += dx1 ;
+					y += dy1 ;
+				} else {
+					x += dx2 ;
+					y += dy2 ;
+				}
 			}
-		}
-		points.add(new Point(to.row, to.col));
+			points.add(new Point(to.row, to.col));
 
-		return points;
+			return points;
 	}
-	
+
 	public static int getNextRandom(int max) {
 		return rand.nextInt(max);
 	}
-	
+
 	public static PointValueCollections getPointAndValueCollections(Collection<PointValue> collection) {
 		Vector<Point> points = new Vector<Point>(collection.size());
 		Vector<Double> values = new Vector<Double>(collection.size());
@@ -146,7 +146,7 @@ public class Utils {
 		}
 		return new PointValueCollections(points, values);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static String listToString(Collection list, String separator) {
 		String string = "";
@@ -158,7 +158,7 @@ public class Utils {
 		}
 		return string;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static Vector<Integer> occurencesInList(Collection list, Object object) {
 		Vector<Integer> occurs = new Vector<Integer>();
@@ -170,7 +170,7 @@ public class Utils {
 		}
 		return occurs;
 	}
-	
+
 	public static Point medianOfPoints(Vector<Point> points) {
 		Point median = null, mean = new Point(0,0);
 		for (Point point : points) {

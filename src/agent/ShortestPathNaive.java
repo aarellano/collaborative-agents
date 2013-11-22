@@ -1,13 +1,11 @@
 package agent;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
 import lib.datastructs.Point;
-import lib.datastructs.VisitedStatusEnum;
 
 public class ShortestPathNaive {
 
@@ -17,7 +15,7 @@ public class ShortestPathNaive {
 		super();
 		this.agent = parent;
 	}
-	
+
 	public Vector<Point> getCFS(Point currentPos, SearchMap currentSearchMap) {
 		Vector<Point> trajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, false);
 		if (this.agent.getEnv().options.takeRisk){
@@ -41,7 +39,7 @@ public class ShortestPathNaive {
 				prevNeighs[i][j] = p1;
 			}
 		}
-		
+
 		//lee algorithm
 		Queue<Point> queue = new LinkedList<Point>();
 		Vector<Point> neighs;
@@ -57,7 +55,7 @@ public class ShortestPathNaive {
 			}
 			Iterator<Point> itr = neighs.iterator();
 			while (itr.hasNext() && !found){
-				Point v = (Point) itr.next();
+				Point v = itr.next();
 				if (p1.equals(prevNeighs[v.row][v.col]) && !v.equals(currentPos)){ //this point was not traversed
 					prevNeighs[v.row][v.col] = lastPos;
 					queue.add(v);
@@ -68,17 +66,17 @@ public class ShortestPathNaive {
 				}
 			}
 		}
-		
+
 		if (found){
 			while(!p1.equals(prevNeighs[lastPos.row][lastPos.col])){
 				trajectory.add(0,lastPos);
 				lastPos = prevNeighs[lastPos.row][lastPos.col];
 			}
 		}
-		
+
 		return trajectory;
 	}
-	
+
 	@Deprecated
 	public int[][] getDistancesMap(Point currentPos) {
 		//set initial distances to -1 (unreachable)
@@ -107,7 +105,7 @@ public class ShortestPathNaive {
 				neighsOfNeighs = new LinkedList<Point>();
 			}
 		}
-		
+
 		return distances;
 	}
 
@@ -133,26 +131,26 @@ public class ShortestPathNaive {
 		return neighs;
 	}
 
-	
+
 	private Vector<Point> getFreeOrUnknownNeighs(Point pos, int nRows, int nCols){
 		Vector<Point> neighs = new Vector<Point>(4);
 		if ((pos.row-1 >= 0) && ((this.agent.getMap().isFree(pos.row-1,pos.col))
-								|| (this.agent.getMap().isUnknown(pos.row-1,pos.col)))){
+				|| (this.agent.getMap().isUnknown(pos.row-1,pos.col)))){
 			Point p = new Point(pos.row-1, pos.col);
 			neighs.add(p);
 		}
 		if ((pos.row+1 < nRows) && ((this.agent.getMap().isFree(pos.row+1,pos.col))
-									|| (this.agent.getMap().isUnknown(pos.row+1,pos.col)))){
+				|| (this.agent.getMap().isUnknown(pos.row+1,pos.col)))){
 			Point p = new Point(pos.row+1, pos.col);
 			neighs.add(p);
 		}
 		if ((pos.col-1 >= 0) && ((this.agent.getMap().isFree(pos.row,pos.col-1))
-								|| (this.agent.getMap().isUnknown(pos.row,pos.col-1)))){
+				|| (this.agent.getMap().isUnknown(pos.row,pos.col-1)))){
 			Point p = new Point(pos.row, pos.col-1);
 			neighs.add(p);
 		}
 		if ((pos.col+1 < nCols) && ((this.agent.getMap().isFree(pos.row,pos.col+1))
-									|| (this.agent.getMap().isUnknown(pos.row,pos.col+1)))){
+				|| (this.agent.getMap().isUnknown(pos.row,pos.col+1)))){
 			Point p = new Point(pos.row, pos.col+1);
 			neighs.add(p);
 		}

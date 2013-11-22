@@ -1,8 +1,7 @@
 
 
-import agent.coverage.CoverageAlgorithmEnum;
 import views.MainScreen;
-import lib.datastructs.Point;
+import agent.coverage.CoverageAlgorithmEnum;
 import environment.Environment;
 import environment.Options;
 
@@ -28,7 +27,7 @@ public class Main {
 				"S"+env.getSeekersCount()+"/"+
 				Options.strategyName(env.options.strategy);
 		System.out.println(env.testName);
-		
+
 		env.screen = new MainScreen();
 		if(useGUI) {
 			env.screen.view(env);

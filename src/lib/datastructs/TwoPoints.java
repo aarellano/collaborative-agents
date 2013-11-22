@@ -36,7 +36,8 @@ public class TwoPoints implements Comparable<TwoPoints> {
 	public TwoPoints clone() {
 		return new TwoPoints(p1, p2);
 	}
-	
+
+	@Override
 	public int compareTo(TwoPoints o) {
 		Integer myHash = hashCode();
 		return myHash.compareTo(new Integer((o.hashCode())));

@@ -12,11 +12,11 @@ public class MapBuilder {
 
 	private Map map;
 	private Planner planner;
-	
+
 	private Agent seeker;
-	
+
 	private Path destinatedPath;
-	
+
 	//private static float DEFAULT_PROB = 0.3f;
 
 	public MapBuilder(int width, int height, Agent parent) {
@@ -25,12 +25,12 @@ public class MapBuilder {
 		this.seeker = parent;
 		updateMap();
 	}
-	
+
 	public void loadMap(String mapID) {
 		map = Map.loadMapWithID(mapID);
 		updateMap();
 	}
-	
+
 	/**
 	 * should be used along with map.setObserved(true) to track map changes in between
 	 */
@@ -43,17 +43,17 @@ public class MapBuilder {
 		}
 		map.setObserved(false);
 	}
-	
+
 
 	public Vector<Double> suggestWeightsForCells(AgentStatus status, SearchMap searcher, Vector<Point> cells) {
-		
+
 		Vector<Double> weights = new Vector<Double>();
 		double value;
 		for(int i = 0; i < cells.size(); i++) {
 			value = 0.0;
 			Point cell = cells.get(i);
 			EnvCellEnum v = planner.getMap().getCell(cell.row, cell.col);
-			if(!(v == EnvCellEnum.BLOCKED || v == EnvCellEnum.UNKNOWN 
+			if(!(v == EnvCellEnum.BLOCKED || v == EnvCellEnum.UNKNOWN
 					|| cell.equals(status.coordinates) ||
 					seeker.isVisitedCell(cell))) {
 				value = map.getNeighborsWithValue(cell, EnvCellEnum.UNKNOWN).size();
@@ -62,7 +62,7 @@ public class MapBuilder {
 		}
 		return weights;
 	}
-	
+
 	public Map getMap() {
 		return map;
 	}
@@ -78,5 +78,5 @@ public class MapBuilder {
 	public void setDestinatedPath(Path destinatedPath) {
 		this.destinatedPath = destinatedPath;
 	}
-	
+
 }

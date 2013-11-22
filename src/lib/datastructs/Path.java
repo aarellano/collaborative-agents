@@ -14,12 +14,12 @@ public class Path {
 	private Vector<Point> pathCells;
 	private Vector<ActionEnum> pathActions;
 	public int pathLength;
-	
+
 	private int nextActionIndex;
-	
+
 	public boolean approximateCountOnly;
 	public int approximateCount;
-	
+
 	public Path(Point source, Point destination) {
 		super();
 		this.source = source;
@@ -30,11 +30,11 @@ public class Path {
 		nextActionIndex = 0;
 		pathLength = 0;
 	}
-	
+
 	public boolean hasActions() {
 		return nextActionIndex < pathActions.size();
 	}
-	
+
 	public ActionEnum getNextPathAction() {
 		ActionEnum action = null;
 		if(hasActions()) {
@@ -52,7 +52,7 @@ public class Path {
 		}
 		return count;
 	}
-	
+
 	public Vector<Partition> getPathPartitions() {
 		return pathPartitions;
 	}
@@ -72,15 +72,15 @@ public class Path {
 	public Point getDestination() {
 		return destination;
 	}
-	
+
 	public void setActionsFromTrajectory(AgentStatus status) {
 		OrientationEnum orientation = status.orientation;
-		
+
 		Point currentPos = this.source;
 		Iterator<Point> itr = pathCells.iterator();
-		
+
 		while(itr.hasNext()){
-			Point nextPos = (Point) itr.next();
+			Point nextPos = itr.next();
 			if (currentPos.row == nextPos.row) {
 				if (currentPos.col + 1 == nextPos.col) {
 					if (orientation == OrientationEnum.EAST) {
@@ -145,7 +145,7 @@ public class Path {
 			currentPos = nextPos;
 		}
 	}
-	
+
 	public void printPath(Stack<Partition> path)
 	{
 		System.out.printf("\n");

@@ -10,7 +10,7 @@ public class FileLinesWriter {
 	private String filePath;
 	private FileWriter fstream;
 	private BufferedWriter out;
-	
+
 	public FileLinesWriter(String filePath, boolean append)
 	{
 		try {
@@ -24,9 +24,9 @@ public class FileLinesWriter {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	public void writeLine(String line) 
+
+
+	public void writeLine(String line)
 	{
 		boolean retry = false;
 		int trials = 1;
@@ -59,7 +59,7 @@ public class FileLinesWriter {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getFolderPath()
 	{
 		String path = null;
@@ -77,6 +77,6 @@ public class FileLinesWriter {
 	public String getFilePath() {
 		return filePath;
 	}
-	
-	
+
+
 }

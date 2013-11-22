@@ -33,11 +33,11 @@ public class Environment {
 
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
-	
+
 	public void init(CoverageAlgorithmEnum coverageAlgoz) {
 		options = new Options();
 		options.coverageAlgorithm = coverageAlgoz;
-		
+
 		tipInfo = new Hashtable<Point, String>();
 		maxs = new Vector<Point>();
 
@@ -45,16 +45,16 @@ public class Environment {
 		agents = new Agent[initialPositions.length];
 		for(int i = 0; i < agents.length; i++) {
 			Point start = getStartingPoint(i);
-			agents[i] = new Agent(i+1, 
-					new AgentStatus(start, OrientationEnum.NORTH), this);			
+			agents[i] = new Agent(i+1,
+					new AgentStatus(start, OrientationEnum.NORTH), this);
 		}
-		
+
 		// Give agents unlimited Vision!
 		if(options.unlimitedVision) {
 			options.Ds = Math.max(getEnvWidth(), getEnvHeight());
 		}
 	}
-	
+
 	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
 		map = Map.loadMapWithID(mapID);
 		initialPositions = generateRandomPositions(agentsCount);
@@ -83,14 +83,14 @@ public class Environment {
 			//seekers[i].loadSearch("visited_2");
 		}
 	}
-	
+
 	public Point[] generateRandomPositions(int agentsCount) {
 		Point[] positions = new Point[agentsCount];
 		Random rand = new Random(System.currentTimeMillis());
 		for(int i = 0 ; i < agentsCount; i++) {
 			Point p = null;
 			do {
-				p = new Point(rand.nextInt(getEnvHeight()), 
+				p = new Point(rand.nextInt(getEnvHeight()),
 						rand.nextInt(getEnvWidth()));
 			} while(!map.isFree(p.row, p.col));
 			positions[i] = p;
@@ -126,7 +126,7 @@ public class Environment {
 		while(!isGameOver()) {
 			clock.incrementSteps();
 			int turn = clock.getStepsCount()%agents.length;
-			if(turn == 0) { 
+			if(turn == 0) {
 				updateGameView();
 				clock.incrementClock();
 			}
@@ -140,10 +140,10 @@ public class Environment {
 
 		// Game Concluded
 		System.out.println("Game took " + clock.getRelativeTimeInClocks() + " turns!");
-		
+
 		clock.incrementGamesCount();
 		logGameResults(true);
-		
+
 		// Print summary each 50 games
 		if(clock.getGamesCount() % 50 == 0) {
 			System.out.println(clock.getGamesCount()+") Elapsed Time: " +
@@ -158,9 +158,9 @@ public class Environment {
 	}
 
 	public void broadcast() {
-//		for (Agent seeker : agents) {
-//			//seeker.stopSeeking();
-//		}
+		//		for (Agent seeker : agents) {
+		//			//seeker.stopSeeking();
+		//		}
 		gameover = true;
 	}
 
@@ -204,8 +204,54 @@ public class Environment {
 		return cells;
 	}
 
-	public boolean isGameOver() {		
-		return gameover || 
+	/**
+	 * Computes the visible cells in each direction based on the robot's current position.
+	 * @param currentPoint the current position of the agent
+	 * @param d the distance limit to look for visibility
+	 * @return the visible cells in each direction
+	 */
+	public Vector<Vector<Point>> getVisibility(Point currentPoint, int d, Map map) {
+		Vector<Vector<Point>> vis = new Vector<Vector<Point>>();
+
+		Point point;
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col, row = currentPoint.row - 1; row >= 0; row--) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(0).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col, row = currentPoint.row + 1; row < map.getHeight(); row++) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(1).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for(int col = currentPoint.col + 1, row = currentPoint.row; col < map.getWidth(); col++) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(2).add(point);
+		}
+
+		vis.add(new Vector<Point>());
+		for (int col = currentPoint.col - 1, row = currentPoint.row; col >= 0; col--) {
+			point = (new Point(row, col));
+			if (map.isObstacle(point.row, point.col))
+				break;
+			vis.get(3).add(point);
+		}
+
+		return vis;
+	}
+
+	public boolean isGameOver() {
+		return gameover ||
 				(options.terminateOnTimeout && clock.getRelativeTimeInClocks() > 1000);
 	}
 
@@ -252,21 +298,21 @@ public class Environment {
 			options.suspendGame = true;
 			// TODO update debug buttons
 		}
-		
+
 		if(options.debugMode && options.stepOverGame) {
 			options.suspendGame = true;
 			options.stepOverGame = false;
 			updateGameView();
 		}
 		if(options.debugMode && options.suspendGame) {
-			suspendThread();			
+			suspendThread();
 		}
 		if(options.debugMode && options.terminateGame) {
 			options.terminateGame = false;
 			gameover = true;
 		}
 	}
-	
+
 	public void suspendThread() {
 		synchronized (this) {
 			try {
@@ -276,7 +322,7 @@ public class Environment {
 			}
 		}
 	}
-	
+
 	public void resumeThread() {
 		synchronized (this) {
 			this.notify();
@@ -359,7 +405,7 @@ public class Environment {
 
 	private void logGameResults(boolean endGame) {
 		if(!options.LOG) return;
-		
+
 		int width = map.getWidth(), height = map.getHeight();
 		String line = "";
 		int count;
@@ -425,13 +471,13 @@ public class Environment {
 		}
 	}
 
-	// Used for console view. 
+	// Used for console view.
 	// Not needed anymore!
 	public void updateGameView() {
 
 		logGameResults(false);
 
-		if(!options.updateView) 
+		if(!options.updateView)
 			return;
 
 		int width = map.getWidth(), height = map.getHeight();
@@ -452,7 +498,7 @@ public class Environment {
 					else
 						System.out.print("|");
 				}
-				System.out.print("||");	
+				System.out.print("||");
 			}
 			System.out.print("\n");
 			for(int j = 0; j < width+4; j++)
