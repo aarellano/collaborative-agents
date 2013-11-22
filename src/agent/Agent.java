@@ -62,7 +62,7 @@ public class Agent {
 		case CFS:
 			coverageAlgorithm = new CFSAlgorithm();
 			break;
-		case GFS:
+		case GS:
 			// create GFS algorithm class
 			break;
 		default:
