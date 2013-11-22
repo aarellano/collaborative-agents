@@ -3,16 +3,16 @@ package lib.datastructs;
 public class Point {
 
 	public int row, col;
-	
+
 	public Point() {
 		row = col = -1;
 	}
-	
+
 	public Point(int row, int col) {
 		this.row = row;
 		this.col = col;
 	}
-		
+
 	public Point(String string) {
 		String[] c = string.split(",");
 		row = Integer.parseInt(c[0].trim());
@@ -22,7 +22,7 @@ public class Point {
 	public int manDistance(Point p) {
 		return Math.abs(this.row-p.row) + Math.abs(this.col-p.col);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

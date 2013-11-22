@@ -28,7 +28,7 @@ public class Planner {
 	private MapPartitioning partitioner;
 	private PartitionsShortestPathFloyd shortestPathBuilder;
 	OrientationEnum orientation = OrientationEnum.NORTH;	//Default
-	
+
 	private Hashtable<Point, Path> cachedPaths;
 	private TreeMap<TwoPoints, Double> distances;
 	private double maxDistance;
@@ -41,12 +41,12 @@ public class Planner {
 		//partitioner.printPartitions();
 		shortestPathBuilder = new PartitionsShortestPathFloyd(partitioner);
 		shortestPathBuilder.logPartitions(partitioner);
-		
+
 		cachedPaths = new Hashtable<Point, Path>();
 		distances = new TreeMap<TwoPoints, Double>();
 		// Init Lengths List
 		maxDistance = map.getWidth()*map.getHeight();
-		
+
 		/*
 		Vector<Point> cells = new Vector<Point>();
 		for(int i = 0; i < map.getHeight(); i++)
@@ -63,42 +63,42 @@ public class Planner {
 				distances.put(new TwoPoints(from, to), l);
 			}
 		}
-		*/
+		 */
 	}
 
 	public Path pathPlan(AgentStatus status, Point destination)
 	{
 		orientation = status.orientation;
 		Point source = status.coordinates.clone();
-		
+
 		Point pathKey = getPathKey(source, destination);
 		Path path = cachedPaths.get(pathKey);
 		if(path == null) {
 			path = new Path(source, destination);
 			if(partitioner.getLabelOfCell(source.row, source.col) == -1 ||
-					partitioner.getLabelOfCell(destination.row, destination.col) == -1) 
+					partitioner.getLabelOfCell(destination.row, destination.col) == -1)
 				return null;
 			//5. Path Planning: Floyd
 			pathActions(path);
 			//cachedPaths.put(pathKey, path);
 		}
-		
+
 		//if(log_flag) printActions();
-	    //log_flag = false;
+		//log_flag = false;
 		return path;
 	}
-	
+
 	public int getApproximatePathLength(Point position, Point endPoint) {
 		Path path = new Path(position, endPoint);
 		path.approximateCountOnly = true;
 		if(partitioner.getPartitionOfCell(position.row, position.col).getLabel() == -1 ||
-				partitioner.getPartitionOfCell(endPoint.row, endPoint.col).getLabel() == -1) 
+				partitioner.getPartitionOfCell(endPoint.row, endPoint.col).getLabel() == -1)
 			return 0;
 		//5. Path Planning: Floyd
 		pathActions(path);
 		return path.approximateCount;
 	}
-	
+
 	private Point getPathKey(Point source, Point destination) {
 		String s1 = source.row + "" + source.col;
 		String s2 = destination.row + "" + destination.col;
@@ -151,7 +151,7 @@ public class Planner {
 		{
 			if(!path.approximateCountOnly)
 				path.getPathActions().addAll(fixOrientation(OrientationEnum.EAST));
-		    distance = endPoint.col - position.col;
+			distance = endPoint.col - position.col;
 			for(int i = 0; i < distance; i++) {
 				if(!path.approximateCountOnly) {
 					path.getPathActions().add(ActionEnum.FORWARD);
@@ -159,13 +159,13 @@ public class Planner {
 					path.getPathCells().add(new Point(position.row, position.col+i+1));
 				} else path.approximateCount ++;
 			}
-	        position.col += distance;
+			position.col += distance;
 		}
 		else if(position.col > endPoint.col)  //West
 		{
 			if(!path.approximateCountOnly)
 				path.getPathActions().addAll(fixOrientation(OrientationEnum.WEST));
-		    distance = position.col - endPoint.col;
+			distance = position.col - endPoint.col;
 			for(int i = 0; i < distance; i++) {
 				if(!path.approximateCountOnly) {
 					path.getPathActions().add(ActionEnum.FORWARD);
@@ -173,7 +173,7 @@ public class Planner {
 					path.getPathCells().add(new Point(position.row, position.col-i-1));
 				} else path.approximateCount ++;
 			}
-	        position.col -= distance;
+			position.col -= distance;
 		}
 	}
 
@@ -210,7 +210,7 @@ public class Planner {
 			}
 			fromPoint.row -= distance;
 		}
-		
+
 		Range intersection = fromPartition.getPartitionHorizontalIntersection(toPartition);
 		if(fromPoint.col < intersection.from)	//East
 		{
@@ -240,7 +240,7 @@ public class Planner {
 			}
 			fromPoint.col -= distance;
 		}
-		
+
 		// make the step into the new cell >> now toCell is entered!
 		if(fromPoint.row < toPartition.getRow())	//South
 		{
@@ -338,7 +338,7 @@ public class Planner {
 		orientation = desired;
 		return actions;
 	}
-	
+
 	public int getDistance(Point p1, Point p2) {
 		TwoPoints ppts = new TwoPoints(p1, p2);
 		Double d = distances.get(ppts);
@@ -350,11 +350,11 @@ public class Planner {
 		}
 		return d.intValue();
 	}
-	
+
 	public double getDistanceNormalized(Point p1, Point p2) {
 		return getDistance(p1, p2)/maxDistance;
 	}
-	
+
 	public int getDistanceInPoints(Point p1, Point p2) {
 		TwoPoints ppts = new TwoPoints(p1, p2);
 		Double d = distances.get(ppts);
@@ -365,12 +365,12 @@ public class Planner {
 		}
 		return d.intValue();
 	}
-	
+
 	public int countTurnsInPath(Vector<ActionEnum> path)
 	{
 		int count = 0, size = path.size();
 		if(size == 0) return 0;
-		int i = (path.get(0) != ActionEnum.FORWARD && path.get(1) != ActionEnum.FORWARD) ? 2 : 
+		int i = (path.get(0) != ActionEnum.FORWARD && path.get(1) != ActionEnum.FORWARD) ? 2 :
 			(path.get(0) != ActionEnum.FORWARD ? 1 : 0);
 		for(; i < size; i++)
 		{
@@ -394,11 +394,11 @@ public class Planner {
 	public void clearCache() {
 		cachedPaths.clear();
 	}
-	
+
 	public int getPartitionLabelOfCell(Point p) {
 		return partitioner.getLabelOfCell(p.row, p.col);
 	}
-	
+
 	public Map getMap() {
 		return map;
 	}

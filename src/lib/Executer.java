@@ -14,29 +14,29 @@ public class Executer {
 		String response = "";
 		double duration = 0;
 		try {
-            Runtime rt = Runtime.getRuntime();
-            long start = System.currentTimeMillis();
-            Process pr = rt.exec(cmd);
-            if(!waitFor) return 0.0;
-            int exitVal = pr.waitFor();
-            long end = System.currentTimeMillis();
-            duration = end-start;
-            
-            BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            String line=null;
-            while((line=input.readLine()) != null) {
-                System.out.println(line);
-                response += line;
-            }
-            //System.out.println("Exited with error code "+exitVal);
-            if(exitVal != 0)
-            	System.out.println("Exited with Error!!...error code "+exitVal);
+			Runtime rt = Runtime.getRuntime();
+			long start = System.currentTimeMillis();
+			Process pr = rt.exec(cmd);
+			if(!waitFor) return 0.0;
+			int exitVal = pr.waitFor();
+			long end = System.currentTimeMillis();
+			duration = end-start;
 
-        } catch(Exception e) {
-            System.out.println(e.toString());
-            e.printStackTrace();
-        }
-        return duration;
+			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+			String line=null;
+			while((line=input.readLine()) != null) {
+				System.out.println(line);
+				response += line;
+			}
+			//System.out.println("Exited with error code "+exitVal);
+			if(exitVal != 0)
+				System.out.println("Exited with Error!!...error code "+exitVal);
+
+		} catch(Exception e) {
+			System.out.println(e.toString());
+			e.printStackTrace();
+		}
+		return duration;
 	}
 
 	public static void RunMatlap(String mFile, Object[] paramList) {

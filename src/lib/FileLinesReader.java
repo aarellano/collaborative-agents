@@ -11,7 +11,7 @@ public class FileLinesReader {
 	private FileReader fstream;
 	private BufferedReader in;
 	public boolean error = false;
-	
+
 	public FileLinesReader(String filePath)
 	{
 		try {
@@ -33,7 +33,7 @@ public class FileLinesReader {
 		}
 		return line;
 	}
-	
+
 	public String[] readLineDelimited(String delim) {
 		String line = readLine();
 		return line.split(delim);
@@ -48,7 +48,7 @@ public class FileLinesReader {
 		}
 		return false;
 	}
-	
+
 	public void close() {
 		try {
 			in.close();
@@ -56,7 +56,7 @@ public class FileLinesReader {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getFolderPath()
 	{
 		String path = null;
@@ -72,9 +72,9 @@ public class FileLinesReader {
 		else path = getFilePath().substring(0,index)+"";
 		return path;
 	}
-	
+
 	public String getFilePath() {
 		return filePath;
 	}
-	
+
 }

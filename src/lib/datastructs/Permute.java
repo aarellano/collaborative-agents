@@ -2,9 +2,9 @@ package lib.datastructs;
 
 // Permute.java -- A class generating all permutations
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.reflect.Array;
 
 public class Permute implements Iterator<Object> {
 
@@ -36,10 +36,12 @@ public class Permute implements Iterator<Object> {
 		}
 	}
 
+	@Override
 	public boolean hasNext() {
 		return next;
 	}
 
+	@Override
 	public void remove() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException();
 	}
@@ -51,6 +53,7 @@ public class Permute implements Iterator<Object> {
 	}
 
 	// does not throw NoSuchElement; it wraps around!
+	@Override
 	public Object next() throws NoSuchElementException {
 
 		formNextPermutation ();  // copy original elements
@@ -77,6 +80,7 @@ public class Permute implements Iterator<Object> {
 		return ar;
 	}
 
+	@Override
 	public String toString () {
 		final int n = Array.getLength(ar);
 		final StringBuffer sb = new StringBuffer ("[");

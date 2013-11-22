@@ -26,7 +26,7 @@ public class MainScreen implements Runnable {
 	// Controller
 	public Environment env;
 	private Thread gameThread;
-	
+
 	// View variables
 	protected Display display;
 	protected Shell shell;
@@ -37,8 +37,8 @@ public class MainScreen implements Runnable {
 	private OptionsView optionsView;
 
 	private Composite gameSpaceComposite;
-	
-	
+
+
 	public void view(Environment env) {
 		this.env = env;
 		open();
@@ -54,7 +54,7 @@ public class MainScreen implements Runnable {
 				display.sleep();
 		}
 	}
-	
+
 	/**
 	 * ///////////////////////////////////////////////////////////////////////////
 	 * @category Create View Components
@@ -70,20 +70,21 @@ public class MainScreen implements Runnable {
 		GridData data = new GridData(GridData.FILL_VERTICAL);
 		shell.setSize(500+26, 500+165);
 		shell.setBounds(150,50,shell.getSize().x,shell.getSize().y);
-				
+
 		//creating the game space composite
 		Composite gameComposite = new Composite(shell, SWT.BORDER);
 		gameComposite.setLayoutData(data);
 		createGameComposite(gameComposite);
-		
+
 		optionsView = new OptionsView();
-		
+
 		shell.addDisposeListener(new DisposeListener(){
+			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
 				stopGameThread();
 			}
 		});
-		
+
 	}
 
 	private void createGameComposite(Composite parent) {
@@ -93,29 +94,29 @@ public class MainScreen implements Runnable {
 		parent.setLayout(layout);
 		GridData data = new GridData(GridData.FILL_BOTH);
 		parent.setLayoutData(data);
-		
+
 		//creating the game space contents
-	    //////////////////////////////////
+		//////////////////////////////////
 		Composite toolBarComposite = new Composite(parent, SWT.BORDER);
 		createControlsTitleBar(toolBarComposite);
-		
+
 		Composite debugtoolBarComposite = new Composite(parent, SWT.BORDER);
 		createDegugToolBar(debugtoolBarComposite);
-		
+
 		data.heightHint = 20;
 		data.widthHint = parent.getBounds().width;
 		parent.layout();
-		
+
 		gameSpaceComposite = new Composite(parent, SWT.EMBEDDED);
-	    createGameSpaceContents(gameSpaceComposite);
+		createGameSpaceContents(gameSpaceComposite);
 	}
-	
+
 	private void createGameSpaceContents(Composite parent) {
 		FillLayout layout = new FillLayout();
 		parent.setLayout(layout);
 		GridData data = new GridData(GridData.FILL_BOTH);
 		parent.setLayoutData(data);
-		
+
 		grid = new GridCanvas(env.getEnvHeight(), env.getEnvWidth(), this);
 		Frame frame = SWT_AWT.new_Frame(parent);
 		frame.add(grid);
@@ -124,7 +125,7 @@ public class MainScreen implements Runnable {
 	private void createControlsTitleBar(Composite parent) {
 		toolbar = new ControlsToolBar(this, parent);
 		int columns = toolbar.getComponentsCount();
-		
+
 		GridLayout barLayout = new GridLayout(columns, false);
 		barLayout.marginHeight = 0;
 		barLayout.marginWidth = 3;
@@ -132,11 +133,11 @@ public class MainScreen implements Runnable {
 		GridData barData = new GridData(GridData.FILL_HORIZONTAL);
 		parent.setLayoutData(barData);
 	}
-	
+
 	private void createDegugToolBar(Composite parent) {
 		debugToolbar = new DebugToolBar(this, parent);
 		int columns = debugToolbar.getComponentsCount();
-		
+
 		GridLayout barLayout = new GridLayout(columns, false);
 		barLayout.marginHeight = 0;
 		barLayout.marginWidth = 3;
@@ -144,28 +145,29 @@ public class MainScreen implements Runnable {
 		GridData barData = new GridData(GridData.FILL_HORIZONTAL);
 		parent.setLayoutData(barData);
 	}
-	
+
 	/**
 	 * ///////////////////////////////////////////////////////////////////////////
 	 * @category Game Logic
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
-	
+
 	// Game thread started when 'Play' button is clicked
 	public void startGameThread() {
 		gameThread = new Thread(this);
 		gameThread.start();
-		
+
 		// Update View
 		if(debugToolbar != null)
 			debugToolbar.updateStatus();
 		if(toolbar != null)
 			toolbar.resetSlider();
 	}
-	
+
 	// Game thread body
+	@Override
 	public void run() {
-		
+
 		// Experiment is a set of run tests
 		env.resetExperiment();
 		do {
@@ -181,32 +183,33 @@ public class MainScreen implements Runnable {
 			while(isAlive());
 			gameThread = null;
 			env.closeLoggers();
-			
+
 			// Update View
 			debugToolbar.updateStatus();
 			toolbar.resetSlider();
-			
+
 			env.options.terminateGame = false;
 		}
 	}
-	
+
 	/**
 	 * ///////////////////////////////////////////////////////////////////////////
 	 * @category View Control
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
-	
+
 	public void redraw() {
 		grid.redraw();
 	}
-	
+
 	public void updateView() {
 		display.asyncExec(new Runnable() {
-            public void run() {
-            	toolbar.updateView();
-            	toolbar.parent.layout();
-            }
-        });
+			@Override
+			public void run() {
+				toolbar.updateView();
+				toolbar.parent.layout();
+			}
+		});
 	}
 
 	public void showOptionsView() {
@@ -215,7 +218,7 @@ public class MainScreen implements Runnable {
 		else
 			optionsView.closeView();
 	}
-	
+
 	/**
 	 * ///////////////////////////////////////////////////////////////////////////
 	 * @category Getters
@@ -225,11 +228,11 @@ public class MainScreen implements Runnable {
 	public boolean isAlive() {
 		return gameThread != null && gameThread.isAlive();
 	}
-	
+
 	public EnvCellEnum getCell(int i, int j) {
 		return env.readSensorsForCell(new Point(i, j));
 	}
-	
+
 	public Shell getShell() {
 		return this.shell;
 	}
@@ -241,6 +244,6 @@ public class MainScreen implements Runnable {
 	public boolean hasBreakpoint(int i, int j) {
 		return debugToolbar.hasBreakpoint(new Point(i, j));
 	}
-		
+
 }
 
