@@ -17,6 +17,10 @@ public class ShortestPathNaive {
 	}
 
 	public Vector<Point> getCFS(Point currentPos, SearchMap currentSearchMap) {
+		return getCFS(currentPos, currentSearchMap, 1);
+	}
+
+	public Vector<Point> getCFS(Point currentPos, SearchMap currentSearchMap, int numberAgents) {
 		Vector<Point> trajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, false);
 		if (this.agent.getEnv().options.takeRisk){
 			Vector<Point> alternativeTrajectory = getPath2NearestUnvisited(currentPos, currentSearchMap, true);
@@ -27,6 +31,11 @@ public class ShortestPathNaive {
 		}
 		return trajectory;
 	}
+
+	public Vector<Vector<Point>> getCFSTrajectories(Point currentPos, SearchMap currentSearchMap, int numberAgents) {
+		return getTrajectories2NearestUnvisited(currentPos, currentSearchMap, false, numberAgents);
+	}
+
 
 	public Vector<Point> getPath2NearestUnvisited(Point currentPos, SearchMap currentSearchMap, boolean risky) {
 		Vector<Point> trajectory = new Vector<Point>();
@@ -75,6 +84,64 @@ public class ShortestPathNaive {
 		}
 
 		return trajectory;
+	}
+
+	public Vector<Vector<Point>> getTrajectories2NearestUnvisited(Point currentPos, SearchMap currentSearchMap, boolean risky, int numberAgents) {
+		Vector<Vector<Point>> trajectories = new Vector<Vector<Point>>(numberAgents);
+		for (int i = 0; i < 4; i++){
+			trajectories.add(new Vector<Point> ());
+		}
+		int nRows = this.agent.getMap().getHeight();
+		int nCols = this.agent.getMap().getWidth();
+		Point[][] prevNeighs = new Point[nRows][nCols];
+		Point p1 = new Point(-1,-1);
+		for (int i = 0; i < nRows; i++){
+			for (int j = 0; j < nCols; j++){
+				prevNeighs[i][j] = p1;
+			}
+		}
+
+		//lee algorithm
+		Queue<Point> queue = new LinkedList<Point>();
+		Vector<Point> neighs;
+		Vector<Point> lastUnvisited = new Vector<Point>();
+		queue.add(currentPos);
+		int found = 0;
+		Point lastPos = null;
+		while (!queue.isEmpty() && found < numberAgents){
+			lastPos = queue.remove();
+			if (risky){
+				neighs = getFreeOrUnknownNeighs(lastPos, nRows, nCols);
+			} else {
+				neighs = getFreeNeighs(lastPos, nRows, nCols);
+			}
+			Iterator<Point> itr = neighs.iterator();
+			System.out.println(itr.hasNext());
+			while (itr.hasNext() && found < numberAgents){
+				Point v = itr.next();
+				if (p1.equals(prevNeighs[v.row][v.col]) && !v.equals(currentPos)){ //this point was not traversed
+					prevNeighs[v.row][v.col] = lastPos;
+					queue.add(v);
+				}
+				if (!currentSearchMap.isVisitedCell(v.row,v.col)){
+					found += 1;
+					lastUnvisited.add(v);
+				}
+			}
+		}
+
+
+		if (found > 0){
+			for (int i = 0; i < found; i++){
+				Point lastPosition = lastUnvisited.elementAt(i);
+				while(!p1.equals(prevNeighs[lastPosition.row][lastPosition.col])){
+					trajectories.elementAt(i).add(0, lastPosition);
+					lastPosition = prevNeighs[lastPosition.row][lastPosition.col];
+				}
+			}
+		}
+
+		return trajectories;
 	}
 
 	@Deprecated

@@ -1,6 +1,20 @@
 package environment;
 
+import java.io.File;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import lib.datastructs.VisionDirectionEnum;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
+import agent.coverage.CollaborativeAlgorithmEnum;
 import agent.coverage.CoverageAlgorithmEnum;
 
 public class Options {
@@ -12,10 +26,14 @@ public class Options {
 	public VisionDirectionEnum visionDirection = VisionDirectionEnum.FOUR_D;
 
 	public boolean loadMap = false;	// Map is known/unknown
+	public String mapName = "res";
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
+	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.ORIG;
+	public int numberAgents = 3;
+	public boolean useGUI = true;
 
 	// Environment settings
 	//======================
@@ -56,6 +74,66 @@ public class Options {
 	public static String PATH_RES = "res/";
 	public static String PATH_MAPS = PATH_RES+"maps/";
 	public static String PATH_LOGS = PATH_RES+"logs/";
+	public boolean LOG_PERFORMANCE = false;
+
+	public Options(String xmlFilePath){
+		xmlFilePath = "/Users/mlmarenchino/git/collaborative-agents/res/config/config.xml";
+		if (xmlFilePath != ""){
+			setVariablesFromXml(xmlFilePath);
+		}
+	}
+
+	private void setVariablesFromXml(String xmlFilePath){
+		try{
+			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse (new File(xmlFilePath));
+
+			// normalize text representation
+			doc.getDocumentElement ().normalize();
+
+			NodeList settings = doc.getElementsByTagName("GeneralSettings");
+			Node generalOptions = settings.item(0);
+			String text = extractTextFromXml(generalOptions, "startingPosManual");
+			startingPosManual = Boolean.parseBoolean(text);
+			text = extractTextFromXml(generalOptions, "coverageAlgorithm");
+			coverageAlgorithm = CoverageAlgorithmEnum.valueOf(text);
+			text = extractTextFromXml(generalOptions, "collaborativeAlgorithm");
+			collaborativeAlgorithm = CollaborativeAlgorithmEnum.valueOf(text);
+			text = extractTextFromXml(generalOptions, "coverageAlgorithm");
+			takeRisk = Boolean.parseBoolean(text);
+			text = extractTextFromXml(generalOptions, "useGUI");
+			useGUI = Boolean.parseBoolean(text);
+			text = extractTextFromXml(generalOptions, "map");
+			mapName = text;
+			text = extractTextFromXml(generalOptions, "logPerformance");
+			LOG_PERFORMANCE = Boolean.parseBoolean(text);
+			text = extractTextFromXml(generalOptions, "numberAgents");
+			numberAgents = Integer.parseInt(text);
+
+		} catch (SAXParseException err) {
+			System.out.println ("** Parsing error" + ", line "
+					+ err.getLineNumber () + ", uri " + err.getSystemId ());
+			System.out.println(" " + err.getMessage ());
+			System.exit(0);
+		}catch (SAXException e) {
+			Exception x = e.getException ();
+			((x == null) ? e : x).printStackTrace ();
+			System.exit(0);
+		}catch (Throwable t) {
+			t.printStackTrace ();
+			System.exit(0);
+		}
+	}
+
+	private String extractTextFromXml(Node node, String tagName){
+		Element element = (Element)node;
+		NodeList list = element.getElementsByTagName(tagName);
+		Element tagElement = (Element)list.item(0);
+		NodeList textNode = tagElement.getChildNodes();
+		return textNode.item(0).getNodeValue().trim();
+
+	}
 
 	public void setViewMapKnowledge() {
 		viewNone();

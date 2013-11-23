@@ -1,5 +1,7 @@
 package environment;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Random;
 import java.util.Vector;
@@ -34,8 +36,11 @@ public class Environment {
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
 
-	public void init(CoverageAlgorithmEnum coverageAlgoz) {
-		options = new Options();
+	public void init(CoverageAlgorithmEnum coverageAlgoz, Options opt) {
+		if (opt != null)
+			options = opt;
+		else
+			options = new Options("");
 		options.coverageAlgorithm = coverageAlgoz;
 
 		tipInfo = new Hashtable<Point, String>();
@@ -55,16 +60,25 @@ public class Environment {
 		}
 	}
 
-	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
+	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz, Options options) {
 		map = Map.loadMapWithID(mapID);
 		initialPositions = generateRandomPositions(agentsCount);
-		init(coverageAlgoz);
+		initialPositions[0] = new Point(7,0);
+		init(coverageAlgoz, options);
+	}
+
+	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
+		this(mapID, agentsCount, coverageAlgoz, null);
+	}
+
+	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz, Options options) {
+		map = Map.loadMapWithID(mapID);
+		initialPositions = coordinates;
+		init(coverageAlgoz, options);
 	}
 
 	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz) {
-		map = Map.loadMapWithID(mapID);
-		initialPositions = coordinates;
-		init(coverageAlgoz);
+		this(mapID, coordinates, coverageAlgoz, null);
 	}
 
 	/**
@@ -461,6 +475,30 @@ public class Environment {
 				if(i < agents[0].getTrajectory().size()-1) s += ", ";
 			}
 			loggerTrajectories.writeLine(s);
+
+			if (options.LOG_PERFORMANCE){
+				String PERFORMANCE_LOG_FILE = Options.PATH_LOGS+"/perf/";
+				PERFORMANCE_LOG_FILE += options.mapName + "_";
+				PERFORMANCE_LOG_FILE += options.numberAgents + "_";
+				PERFORMANCE_LOG_FILE += options.coverageAlgorithm + "_";
+				PERFORMANCE_LOG_FILE += options.collaborativeAlgorithm + "_";
+				for (Point pos : initialPositions){
+					PERFORMANCE_LOG_FILE += "x" + pos.col + "_";
+					PERFORMANCE_LOG_FILE += "y" + pos.row + "_";
+				}
+				PERFORMANCE_LOG_FILE += "test.txt";
+				try{
+					PrintWriter out = new PrintWriter(PERFORMANCE_LOG_FILE);
+					PerformanceTest perf = new PerformanceTest(this);
+					out.println("Total number of revisited cells: " + perf.getTotalNumberRevisitedCells());
+					out.println("Number of cells: " + perf.getNumberCells());
+					out.println("Total number of steps taken: " + perf.getTotalNumberSteps());
+					out.close();
+				} catch (IOException e) {
+					System.out.println("Unable to open file " + PERFORMANCE_LOG_FILE);
+					System.exit(0);
+				}
+			}
 
 		} else if(options.LOG) {
 			LOG_FILE = Options.PATH_LOGS+testName+"/log";
