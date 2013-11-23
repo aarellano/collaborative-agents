@@ -26,14 +26,21 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 		Vector<Vector<Point>> vis = agent.getEnv().getVisibility(status.coordinates, agent.getEnv().options.Ds, map);
 		Collections.sort(vis, greedyComparator);
 		trajectory = vis.get(0);
-		if (sum(vis.get(0)) == 0) {
+
+		if (sum(vis.get(0)) != 0) {
+			// This loop trims any visited cell at the end of trajectory
+			for (int i = trajectory.indexOf(trajectory.lastElement()); i >= 0; i--) {
+				if (agent.getSearchMap().isVisitedCell(trajectory.get(i).row, trajectory.get(i).col))
+					trajectory.remove(i);
+				else
+					break;
+			}
+		} else {
 			ShortestPathNaive sp = new ShortestPathNaive(agent);
 			trajectory = sp.getCFS(status.coordinates, agent.getSearchMap());
 		}
 
-		Path result = agent.getMapBuilder().getPlanner().pathPlan(status, status.coordinates);
-		result.getPathCells().addAll(trajectory);
-		result.setActionsFromTrajectory(status);
+		Path result = agent.getMapBuilder().getPlanner().pathPlan(status, trajectory.lastElement());
 
 		return result;
 	}
