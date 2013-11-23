@@ -26,13 +26,13 @@ public class Options {
 	public VisionDirectionEnum visionDirection = VisionDirectionEnum.FOUR_D;
 
 	public boolean loadMap = false;	// Map is known/unknown
-	public String mapName = "res";
+	public String mapName = "rep";
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
 	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.ORIG;
-	public boolean collaborate = true;
+	public boolean collaborate = (collaborativeAlgorithm == CollaborativeAlgorithmEnum.ORIG);
 	public int numberAgents = 3;
 	public boolean useGUI = true;
 
@@ -78,7 +78,6 @@ public class Options {
 	public boolean LOG_PERFORMANCE = false;
 
 	public Options(String xmlFilePath){
-		xmlFilePath = "/Users/mlmarenchino/git/collaborative-agents/res/config/config.xml";
 		if (xmlFilePath != ""){
 			setVariablesFromXml(xmlFilePath);
 		}

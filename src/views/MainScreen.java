@@ -242,7 +242,7 @@ public class MainScreen implements Runnable {
 	}
 
 	public boolean hasBreakpoint(int i, int j) {
-		return debugToolbar.hasBreakpoint(new Point(i, j));
+		return debugToolbar == null ? false : debugToolbar.hasBreakpoint(new Point(i, j));
 	}
 
 }

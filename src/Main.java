@@ -21,10 +21,9 @@ public class Main {
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(20, 20)};
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 0), new Point(0, 0)};
 		int strategy = Options.DIAGONAL;
-		CoverageAlgorithmEnum coverageAlgoz = CoverageAlgorithmEnum.CFS;
+		CoverageAlgorithmEnum coverageAlgoz = options.coverageAlgorithm;
 		boolean useGUI = options.useGUI;
 		int numberAgents = options.numberAgents;
-
 
 		// Initialize the environment
 		//Environment env = new Environment(mapName, initialPos, coverageAlgoz);
