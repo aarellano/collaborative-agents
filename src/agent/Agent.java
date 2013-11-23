@@ -17,7 +17,7 @@ import lib.datastructs.PointValue;
 import lib.datastructs.PointValueComparator;
 import agent.coverage.CFSAlgorithm;
 import agent.coverage.CoverageAlgorithm;
-import agent.coverage.GSAlgorithm;
+import agent.coverage.DGSAlgorithm;
 import agent.coverage.OldSearchAlgorithm;
 import environment.EnvCellEnum;
 import environment.Environment;
@@ -63,8 +63,8 @@ public class Agent {
 		case CFS:
 			coverageAlgorithm = new CFSAlgorithm();
 			break;
-		case GS:
-			coverageAlgorithm = new GSAlgorithm();
+		case DGS:
+			coverageAlgorithm = new DGSAlgorithm();
 			break;
 		default:
 			break;

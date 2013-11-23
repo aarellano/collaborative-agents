@@ -13,8 +13,9 @@ import agent.Agent;
 import agent.AgentStatus;
 import agent.ShortestPathNaive;
 
-public class GSAlgorithm implements CoverageAlgorithm {
+public class DGSAlgorithm implements CoverageAlgorithm {
 	Agent agent;
+	@SuppressWarnings("unchecked")
 	@Override
 	public Path selectPath(Agent agent) {
 		this.agent = agent;
@@ -54,9 +55,11 @@ public class GSAlgorithm implements CoverageAlgorithm {
 		Iterator<Point> itr = list.iterator();
 		while (itr.hasNext()) {
 			Point point = itr.next();
-			if (!agent.getSearchMap().isVisitedCell(point.row, point.col)) {
-				sum = sum + 1;
-			}
+			if (agent.getEnv().options.collaborate)
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col) &&
+						!agent.getSearchMap().isPlannedCell(point.row, point.col)) {
+					sum = sum + 1;
+				}
 		}
 		return sum;
 	}
