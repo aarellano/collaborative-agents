@@ -1,24 +1,23 @@
 package lib.datastructs;
 
-import java.awt.Dimension;
 
 public class Partition {
 
 	private int row, col;
-	private Dimension dimension;
+	private int width, height;
 	private int label;
 
 	public Partition(int row, int col, int label) {
 		this.row = row;
 		this.col = col;
-		this.dimension = new Dimension(1, 1);
+		this.width = this.height = 1;
 		this.label = label;
 	}
 
 	@Override
 	public String toString() {
 		return label + ", (Row:" + row + ", Col:" + col +
-				", Width:" + dimension.width + ", Height:" + dimension.height + ")";
+				", Width:" + width + ", Height:" + height + ")";
 	}
 
 	public Range getPartitionHorizontalIntersection(Partition p) {
@@ -39,14 +38,6 @@ public class Partition {
 		return label;
 	}
 
-	public Dimension getDimension() {
-		return dimension;
-	}
-
-	public void setDimension(Dimension dimension) {
-		this.dimension = dimension;
-	}
-
 	public int getRow() {
 		return row;
 	}
@@ -56,18 +47,18 @@ public class Partition {
 	}
 
 	public void setWidth(int width) {
-		this.dimension.width = width;
+		this.width = width;
 	}
 
 	public void setHeight(int height) {
-		this.dimension.height = height;
+		this.height = height;
 	}
 
 	public int getWidth() {
-		return this.dimension.width;
+		return width;
 	}
 
 	public int getHeight() {
-		return this.dimension.height;
+		return height;
 	}
 }
