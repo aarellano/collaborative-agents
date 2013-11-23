@@ -16,6 +16,7 @@ public class Options {
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
+	public boolean collaborate = true;
 
 	// Environment settings
 	//======================

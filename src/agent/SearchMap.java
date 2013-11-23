@@ -3,6 +3,7 @@ package agent;
 import java.util.Vector;
 
 import lib.datastructs.Map;
+import lib.datastructs.Path;
 import lib.datastructs.Point;
 import lib.datastructs.VisionDirectionEnum;
 import lib.datastructs.VisitedStatusEnum;
@@ -93,6 +94,20 @@ public class SearchMap {
 
 	public boolean isVisitedCell(int row, int col) {
 		return visited[row][col] == VisitedStatusEnum.VISITED;
+	}
+
+	public boolean isPlannedCell(int row, int col) {
+		for (Agent agent : seeker.getEnv().getSeekers()) {
+			Path path = agent.getMapBuilder().getDestinatedPath();
+			if (path == null)
+				return true;
+			Vector<Point> pathCells = path.getPathCells();
+			if (pathCells.contains(new Point(row, col))) {
+				System.out.println(pathCells);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public VisitedStatusEnum getScanStatusCell(int row, int col) {
