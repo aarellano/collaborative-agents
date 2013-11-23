@@ -32,6 +32,7 @@ public class Options {
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
 	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.ORIG;
+	public boolean collaborate = true;
 	public int numberAgents = 3;
 	public boolean useGUI = true;
 

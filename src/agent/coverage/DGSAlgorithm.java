@@ -13,8 +13,9 @@ import agent.Agent;
 import agent.AgentStatus;
 import agent.ShortestPathNaive;
 
-public class GSAlgorithm implements CoverageAlgorithm {
+public class DGSAlgorithm implements CoverageAlgorithm {
 	Agent agent;
+	@SuppressWarnings("unchecked")
 	@Override
 	public Path selectPath(Agent agent) {
 		this.agent = agent;
@@ -25,14 +26,21 @@ public class GSAlgorithm implements CoverageAlgorithm {
 		Vector<Vector<Point>> vis = agent.getEnv().getVisibility(status.coordinates, agent.getEnv().options.Ds, map);
 		Collections.sort(vis, greedyComparator);
 		trajectory = vis.get(0);
-		if (sum(vis.get(0)) == 0) {
+
+		if (sum(vis.get(0)) != 0) {
+			// This loop trims any visited cell at the end of trajectory
+			for (int i = trajectory.indexOf(trajectory.lastElement()); i >= 0; i--) {
+				if (agent.getSearchMap().isVisitedCell(trajectory.get(i).row, trajectory.get(i).col))
+					trajectory.remove(i);
+				else
+					break;
+			}
+		} else {
 			ShortestPathNaive sp = new ShortestPathNaive(agent);
 			trajectory = sp.getCFS(status.coordinates, agent.getSearchMap());
 		}
 
-		Path result = agent.getMapBuilder().getPlanner().pathPlan(status, status.coordinates);
-		result.getPathCells().addAll(trajectory);
-		result.setActionsFromTrajectory(status);
+		Path result = agent.getMapBuilder().getPlanner().pathPlan(status, trajectory.lastElement());
 
 		return result;
 	}
@@ -54,9 +62,11 @@ public class GSAlgorithm implements CoverageAlgorithm {
 		Iterator<Point> itr = list.iterator();
 		while (itr.hasNext()) {
 			Point point = itr.next();
-			if (!agent.getSearchMap().isVisitedCell(point.row, point.col)) {
-				sum = sum + 1;
-			}
+			if (agent.getEnv().options.collaborate)
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col) &&
+						!agent.getSearchMap().isPlannedCell(point.row, point.col)) {
+					sum = sum + 1;
+				}
 		}
 		return sum;
 	}
