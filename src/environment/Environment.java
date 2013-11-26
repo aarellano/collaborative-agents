@@ -99,7 +99,20 @@ public class Environment {
 
 	//TODO add partitioning start positions
 
-	//TODO start at the same location
+	// start at the same location
+	public Point[] generateSamePositions(int agentsCount) {
+		Point[] positions = new Point[agentsCount];
+		Random rand = new Random(System.currentTimeMillis());
+		Point p = null;
+		do {
+			p = new Point(rand.nextInt(getEnvHeight()),
+					rand.nextInt(getEnvWidth()));
+		} while(!map.isFree(p.row, p.col));
+		for(int i = 0 ; i < agentsCount; i++) {
+			positions[i] = p;
+		}
+		return positions;
+	}
 
 	public Point[] generateRandomPositions(int agentsCount) {
 		Point[] positions = new Point[agentsCount];
