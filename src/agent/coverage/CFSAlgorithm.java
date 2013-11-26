@@ -82,7 +82,12 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 			for(int col = 0; col < agent.getMap().getWidth(); col++) {
 				Point p = new Point(row, col);
 				boolean validPath = true;
-				if(agent.getMap().isFree(row, col) && !agent.isVisitedCell(p)) {
+				boolean targetCondition;
+				if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.SHARED_PLAN)
+					targetCondition = agent.getMap().isFree(row, col) && !agent.isVisitedCell(p) && !agent.getEnv().isDestinatedCell(p);
+				else
+					targetCondition = agent.getMap().isFree(row, col) && !agent.isVisitedCell(p);
+				if(targetCondition) {
 					Path path = agent.getMapBuilder().getPlanner().pathPlan(agent.getStatus(), p);
 					//					System.out.println("From:"+agent.getStatus().coordinates);
 					//					System.out.println("To:"+p);
