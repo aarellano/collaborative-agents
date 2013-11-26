@@ -62,11 +62,13 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 		Iterator<Point> itr = list.iterator();
 		while (itr.hasNext()) {
 			Point point = itr.next();
-			if (agent.getEnv().options.collaborate)
+			if (agent.getEnv().options.collaborate) {
 				if (!agent.getSearchMap().isVisitedCell(point.row, point.col) &&
 						!agent.getSearchMap().isPlannedCell(point.row, point.col)) {
 					sum = sum + 1;
 				}
+			} else if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
+				sum = sum + 1;
 		}
 		return sum;
 	}
