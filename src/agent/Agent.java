@@ -69,7 +69,6 @@ public class Agent {
 		default:
 			break;
 		}
-
 	}
 
 	/**
@@ -80,12 +79,13 @@ public class Agent {
 
 	public void prepareGame() {
 		// Initialization
-		trajectory.clear();
 		resetNextDestination();
 		status = new AgentStatus(initialPos.coordinates.clone(), initialPos.orientation);
 		searcher.init();
 		communicator.clearLocalSearchInfo();
 
+		trajectory.clear();
+		trajectory.add(status.coordinates.clone());
 		//loadSearch("visited_2");
 	}
 
@@ -172,8 +172,11 @@ public class Agent {
 
 	public void takeATurn() {
 		// Cancel destination path if the destination cell is already visited
-		if(mapBuilder.getDestinatedPath() == null || !mapBuilder.getDestinatedPath().hasActions() ||
-				evaluateCell(mapBuilder.getDestinatedPath().getDestination()) == 0) {
+		Path destinationPath = mapBuilder.getDestinatedPath();
+		if(destinationPath == null || !destinationPath.hasActions()
+				|| searcher.isVisitedCell(destinationPath.getDestination().row,
+						destinationPath.getDestination().col)
+				/*||	evaluateCell(mapBuilder.getDestinatedPath().getDestination()) == 0*/) {
 			mapBuilder.setDestinatedPath(selectPath());
 		}
 		if (!mapBuilder.getDestinatedPath().getPathActions().isEmpty()){
@@ -336,12 +339,6 @@ public class Agent {
 		}
 
 		return weights;
-	}
-
-	private double evaluateCell(Point cell) {
-		Vector<Point> c = new Vector<Point>();
-		c.add(cell);
-		return evaluateCells(c).poll().value;
 	}
 
 	private double evaluateTerrForCell(Point cell) {

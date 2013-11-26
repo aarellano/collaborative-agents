@@ -97,6 +97,10 @@ public class Environment {
 		}
 	}
 
+	//TODO add partitioning start positions
+
+	//TODO start at the same location
+
 	public Point[] generateRandomPositions(int agentsCount) {
 		Point[] positions = new Point[agentsCount];
 		Random rand = new Random(System.currentTimeMillis());
