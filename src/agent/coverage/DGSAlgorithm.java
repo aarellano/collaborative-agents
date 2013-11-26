@@ -57,18 +57,34 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 		}
 	};
 
-	public Integer sum(List<Point> list) {
-		Integer sum = 0;
+	public Double sum(List<Point> list) {
+		Double sum = 0.0;
 		Iterator<Point> itr = list.iterator();
 		while (itr.hasNext()) {
 			Point point = itr.next();
-			if (agent.getEnv().options.collaborate) {
-				if (!agent.getSearchMap().isVisitedCell(point.row, point.col) &&
-						!agent.getSearchMap().isPlannedCell(point.row, point.col)) {
+			switch (agent.getEnv().options.collaborativeAlgorithm) {
+			case ORIG:
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
 					sum = sum + 1;
+				break;
+			case SHARED_PLAN:
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col) &&
+						!agent.getSearchMap().isPlannedCell(point.row, point.col))
+					sum = sum + 1;
+				break;
+			case GAUSS:
+				GaussianWeight gaussian = new GaussianWeight(agent);
+				Point destinationPoint = null;
+				for (int i = list.indexOf(((Vector<Point>) list).lastElement()); i >= 0; i--) {
+					if (!agent.getSearchMap().isVisitedCell(list.get(i).row, list.get(i).col))
+						destinationPoint = new Point(list.get(i).row, list.get(i).col);
 				}
-			} else if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
-				sum = sum + 1;
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
+					sum = sum + 5.0 * gaussian.weightPoint(destinationPoint);
+				break;
+			default:
+				break;
+			}
 		}
 		return sum;
 	}
