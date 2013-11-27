@@ -1,5 +1,6 @@
 package agent.coverage;
 
+import java.util.Random;
 import java.util.Vector;
 
 import lib.Utils;
@@ -13,6 +14,7 @@ import agent.ShortestPathNaive;
 
 public class CFSAlgorithm implements CoverageAlgorithm {
 
+	Random rand = new Random(System.currentTimeMillis());
 
 	public Path getPath(Agent agent) {
 
@@ -77,58 +79,77 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 		//		}
 		Vector<Path> paths = new Vector<Path>();
 		Vector<Double> weights = new Vector<Double>();
-		ShortestPathNaive sp = new ShortestPathNaive(agent);
+		Path tempPath = null;
 		for(int row = 0; row < agent.getMap().getHeight(); row++) {
 			for(int col = 0; col < agent.getMap().getWidth(); col++) {
 				Point p = new Point(row, col);
-				boolean validPath = true;
-				boolean targetCondition;
-				if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.SHARED_PLAN)
-					targetCondition = agent.getMap().isFree(row, col) && !agent.isVisitedCell(p) && !agent.getEnv().isDestinatedCell(p);
-				else
-					targetCondition = agent.getMap().isFree(row, col) && !agent.isVisitedCell(p);
-				if(targetCondition) {
+				if(agent.getMap().isFree(row, col) && !agent.isVisitedCell(p)) {
+
 					Path path = agent.getMapBuilder().getPlanner().pathPlan(agent.getStatus(), p);
-					//					System.out.println("From:"+agent.getStatus().coordinates);
-					//					System.out.println("To:"+p);
-					for(int i = 0; i < path.getPathCells().size(); i++) {
-						p = path.getPathCells().get(i);
-						if(!agent.getMap().isValidCell(p.row,  p.col) || !agent.getMap().isFree(p.row, p.col)) {
-							validPath = false;
-							break;
-						}
-					}
-					if(!validPath) continue;
+					if(!agent.getMap().isValidPath(path)) continue;
+
+					tempPath = path;
+					if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.SHARED_PLAN &&
+							agent.getSearchMap().isPlannedCell(row, col)) continue;
+
 					double weight = weightPath(path.getPathCells(), agent);
 					paths.add(path);
 					weights.add(new Double(weight));
 				}
 			}
 		}
+		if(agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.FOLLOWERS_BRAKER) {
+			int region = 5;
+			Vector<Agent> agents = agent.getAgentNeighborsWithinRange(region);
+			Vector<Integer> toRemove = new Vector<Integer>();
+			for (int i = 0; i < paths.size(); i++) {
+				Point p = paths.get(i).getDestination();
+				for (Agent neighbor : agents) {
+					if(agent.getID() < neighbor.getID() ||
+							agent.getMapBuilder().getPlanner().getDistanceInPoints(p,
+									neighbor.getStatus().coordinates) > region)
+						continue;
+					toRemove.add(i);
+					break;
+				}
+			}
+			for(int i = 0; i < toRemove.size(); i++) {
+				int index = toRemove.get(i)-i;
+				paths.remove(index);
+				weights.remove(index);
+			}
+		}
+
+		if(paths.isEmpty())
+			return tempPath;
 		int selected = Utils.selectByMax(weights, 0);
 		return paths.get(selected);
 	}
 
 	private double weightPath(Vector<Point> path, Agent agent) {
-		double weight = 0;
+		double weight = 1.0 / path.size();
 		CollaborativeAlgorithmEnum collaborate = agent.getEnv().options.collaborativeAlgorithm;
 		switch (collaborate) {
-		case ORIG:
-			weight = 1.0 / path.size();
-			break;
 		case GAUSS:
-			GaussianWeight gaussian = new GaussianWeight(agent);
-			Point destination = path.lastElement();
-			weight =  path.size() ;/// (agent.getMap().getWidth()*agent.getMap().getHeight()); // normalize
-			weight = 1.0 / weight;
-			weight = gaussian.weightPoint(destination) * weight;
+			weight = GaussianWeight.weightPath(agent, path);
 			break;
-		case FOLLOWERS_BRAKER:
-
-			break;
+			//		case FOLLOWERS_BRAKER:
+			//			Vector<Point> agents = agent.getAgentNeighborsWithinRange(2);
+			//			if(agents.size() > 0) {
+			//				if(agent.getID() == 1)
+			//					System.out.println("Neighbors:" + agents.size());
+			//				//weight *= rand.nextInt(5);
+			//				//				weight = GaussianWeight.weightPath(agent, path, agents.size()+1,
+			//				//						//						new Point(agent.getEnv().getEnvHeight()/2,
+			//				//						//								agent.getEnv().getEnvWidth()/2));
+			//				//						agent.getStatus().coordinates);
+			//			}
+			//			break;
 		default:
 			break;
 		}
 		return weight;
 	}
+
+
 }

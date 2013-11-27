@@ -139,6 +139,17 @@ public class Map {
 	{
 		return col >= 0 && col < width;
 	}
+
+	public boolean isValidPath(Path path) {
+		for(int i = 0; i < path.getPathCells().size(); i++) {
+			Point p = path.getPathCells().get(i);
+			if(!isValidCell(p.row,  p.col) || !isFree(p.row, p.col)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public Vector<Point> getCellsWithNeighborValue(EnvCellEnum neighborValue) {
 		Vector<Point> cells = new Vector<Point>();
 		for(int i = 0; i < height; i++)

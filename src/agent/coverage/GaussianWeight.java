@@ -1,5 +1,7 @@
 package agent.coverage;
 
+import java.util.Vector;
+
 import lib.datastructs.Point;
 import agent.Agent;
 
@@ -11,14 +13,19 @@ public class GaussianWeight {
 	private double sigmaSquared, normalFactor = 1;
 
 	public GaussianWeight(Agent agent) {
+		this(agent, agent.getEnv().getSeekersCount(),
+				new Point(agent.getMap().getHeight()/2,
+						agent.getMap().getWidth()/2));
+	}
+
+	public GaussianWeight(Agent agent, int agentsCount, Point center) {
 		this.agent = agent;
-		calculateParameters(new Point(agent.getMap().getHeight()/2,
-				agent.getMap().getWidth()/2));
+		calculateParameters(center, agentsCount);
 		normalize();
 	}
 
-	private void calculateParameters(Point origin) {
-		double angle = 360.0/agent.getEnv().getSeekersCount();
+	private void calculateParameters(Point origin, int count) {
+		double angle = 360.0/count;
 		double myAngle = angle*(agent.getID())-1;
 		double tan = Math.abs(Math.tan(Math.toRadians(myAngle)));
 		int quadNum = (int) (myAngle/90)+1;
@@ -93,4 +100,19 @@ public class GaussianWeight {
 		return phi / normalFactor;
 	}
 
+	public double weightPath(Vector<Point> path) {
+		Point destination = path.lastElement();
+		double weight =  path.size() + 1;/// (agent.getMap().getWidth()*agent.getMap().getHeight()); // normalize
+		weight = 1.0 / weight;
+		weight = this.weightPoint(destination) * weight;
+		return weight;
+	}
+
+	public static double weightPath(Agent agent, Vector<Point> path, int partitionsCount, Point center) {
+		return new GaussianWeight(agent, partitionsCount, center).weightPath(path);
+	}
+
+	public static double weightPath(Agent agent, Vector<Point> path) {
+		return new GaussianWeight(agent).weightPath(path);
+	}
 }

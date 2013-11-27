@@ -181,7 +181,8 @@ public class Agent {
 				/*||	evaluateCell(mapBuilder.getDestinatedPath().getDestination()) == 0*/) {
 			mapBuilder.setDestinatedPath(selectPath());
 		}
-		if (!mapBuilder.getDestinatedPath().getPathActions().isEmpty()){
+		if (mapBuilder.getDestinatedPath() != null &&
+				!mapBuilder.getDestinatedPath().getPathActions().isEmpty()){
 			ActionEnum action = null;
 			do {
 				action = mapBuilder.getDestinatedPath().getNextPathAction();
@@ -439,6 +440,18 @@ public class Agent {
 	 * @category Getters
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
+
+	public Vector<Agent> getAgentNeighborsWithinRange(int distance) {
+		Vector<Agent> neighbors = new Vector<Agent>();
+		Point myPoint = status.coordinates;
+		for (Agent agent : env.getSeekers()) {
+			if(agent == this) continue;
+			Point p = agent.getStatus().coordinates;
+			if(agent.mapBuilder.getPlanner().getDistanceInPoints(myPoint, p) <= distance)
+				neighbors.add(agent);
+		}
+		return neighbors;
+	}
 
 	public Vector<Point> getTrajectory() {
 		Vector<Point> traj = new Vector<Point>(trajectory.size());
