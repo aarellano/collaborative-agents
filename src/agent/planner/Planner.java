@@ -360,6 +360,8 @@ public class Planner {
 		Double d = distances.get(ppts);
 		if(d == null) {
 			AgentStatus status = new AgentStatus(p1, OrientationEnum.NORTH);
+			Path path = pathPlan(status, p2);
+			if(path == null || !map.isValidPath(path)) return (int) maxDistance;
 			d = (double)pathPlan(status, p2).getPathCells().size();
 			//distances.put(ppts, d);
 		}

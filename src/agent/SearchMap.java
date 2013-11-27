@@ -103,7 +103,7 @@ public class SearchMap {
 				return true;
 			Vector<Point> pathCells = path.getPathCells();
 			if (pathCells.contains(new Point(row, col))) {
-				System.out.println(pathCells);
+				//System.out.println(pathCells);
 				return true;
 			}
 		}

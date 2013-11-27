@@ -108,6 +108,7 @@ public class Environment {
 			p = new Point(rand.nextInt(getEnvHeight()),
 					rand.nextInt(getEnvWidth()));
 		} while(!map.isFree(p.row, p.col));
+		p = new Point(0,0);
 		for(int i = 0 ; i < agentsCount; i++) {
 			positions[i] = p;
 		}
@@ -164,7 +165,7 @@ public class Environment {
 			checkDebugStatus(agents[turn]);
 
 			agents[turn].takeATurn();
-			System.out.println(clock.getRelativeTimeInClocks());
+			//System.out.println(clock.getRelativeTimeInClocks());
 		}
 		updateGameView();
 
