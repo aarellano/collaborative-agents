@@ -507,8 +507,10 @@ public class Environment {
 					PrintWriter out = new PrintWriter(PERFORMANCE_LOG_FILE);
 					PerformanceTest perf = new PerformanceTest(this);
 					out.println("Total number of revisited cells: " + perf.getTotalNumberRevisitedCells());
-					out.println("Number of cells: " + perf.getNumberCells());
 					out.println("Total number of steps taken: " + perf.getTotalNumberSteps());
+					out.println("Total time: " + clock.getRelativeTimeInClocks());
+					out.println("Number of obstacles: " + map.getNumberObstacles());
+					out.println("Number of cells: " + map.getHeight()*map.getWidth());
 					out.close();
 				} catch (IOException e) {
 					System.out.println("Unable to open file " + PERFORMANCE_LOG_FILE);

@@ -2,22 +2,22 @@
 import os
 import sys
 import subprocess
-import numpy
+import pickle
 
 config_file_prefix = "res/config/config"
 logs_path = "../res/logs/perf/"
 
 #algorithms to test
-maps = ["empty","reg","rep","spiders"]
+maps = ["empty"]#,"reg","rep","spiders"]
 maps_description = {}
-algorithms = ["CFS"]
+algorithms = ["CFS"]#,"DGS"]
 collaborative = ["ORIG","GAUSS"]
 
 #number of agents to use
 number_agents = [1,2,3,4,5,10]
 
 
-def run_particular_test(path, config_fname):
+def run_defined_test(path, config_fname):
 	orig_dir = os.getcwd()
 	os.chdir(path)
 	subprocess.call("java -XstartOnFirstThread -jar MultiAgentCoverage.jar " + config_fname + ">/dev/null", shell=True)
@@ -55,17 +55,19 @@ def parse_log_files(logs_path):
 		res[collaborative][algorithm][mapa][agents]['revisited'].append(int(values[0]))
 		res[collaborative][algorithm][mapa][agents]['steps'].append(int(values[1]))
 		res[collaborative][algorithm][mapa][agents]['time'].append(int(values[2]))
+		res[collaborative][algorithm][mapa][agents]['obstacles'].append(int(values[3]))
+		res[collaborative][algorithm][mapa][agents]['cells'].append(int(values[4]))
 		if not maps_description.has_key(mapa):
 			maps_description[mapa] = {}
 			maps_description[mapa]['obstacles'] = int(values[3])
 			maps_description[mapa]['cells'] = int(values[4])
-	
+		
 	return res
 
 def hash_to_csv(hashtbl, fname):
 	separator = ','
 	fd = open(fname,'w')
-	fd.write("Map" + separator + "Map obstacles ratio" + separator + "Map num obstacles" + separator + "Map num cells" + separator +
+	fd.write("Map" + separator + "Map obstacles ratio" + separator + "Map num obstacles" + separator + "Map num cells" + separator + 
 				"Algorithm" + separator + "Coll type" + separator + "Number of Agents" + separator)
 	fd.write("Initial Pos" + separator + "Number of revisited cells" + separator + "Number of steps" + separator + "Time" + "\n")
 	for coll in sorted(hashtbl):
@@ -79,7 +81,7 @@ def hash_to_csv(hashtbl, fname):
 						fd.write(str(maps_description[mapa]['cells']) + separator)
 						fd.write(coll + separator)
 						fd.write(algorithm + separator)
-						fd.write(agent + separator)
+						fd.write(agent + separator)	
 						fd.write("random" + separator)	#initial position is always random
 						fd.write(str(hashtbl[coll][algorithm][mapa][agent]['revisited'][i]) + separator)
 						fd.write(str(hashtbl[coll][algorithm][mapa][agent]['steps'][i]) + separator)
@@ -90,12 +92,13 @@ def hash_to_csv(hashtbl, fname):
 
 
 if __name__ == "__main__":
-	if len(sys.argv) != 4:
-	    sys.stderr.write('Usage: sys.argv[0] logs_paths results_fname number_tests_to_run')
+	if len(sys.argv) != 5:
+	    sys.stderr.write('Usage: sys.argv[0] logs_paths results_fname result_serialization_fname number_tests_to_run\n')
 	    sys.exit(1)
 	logs_folder_path = sys.argv[1]
 	results_fname = sys.argv[2]
-	N = int(sys.argv[3])
+	result_serialization_fname = sys.argv[3]
+	N = int(sys.argv[4])
 
 	for mapa in maps:
 		for algorithm in algorithms:
@@ -103,8 +106,9 @@ if __name__ == "__main__":
 				for agent in number_agents:
 					for i in range(N):
 						config_fname = config_file_prefix + "_" + mapa + "_" + algorithm + "_" + coll + "_" + str(agent) + ".xml"
-						print "Running test " + str(i+1) + " out of " + str(N) + " for ", config_fname
-						run_particular_test("..", config_fname)
+						print "Running test " + str(i+1) + " out of " + str(N) + " for " + config_fname
+						run_defined_test("..", config_fname)
 
 	res = parse_log_files(logs_folder_path)
+	pickle.dump(res, open(result_serialization_fname, "wb" ))
 	hash_to_csv(res, results_fname)
