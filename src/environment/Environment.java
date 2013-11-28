@@ -62,7 +62,10 @@ public class Environment {
 
 	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz, Options options) {
 		map = Map.loadMapWithID(mapID);
-		initialPositions = generateRandomPositions(agentsCount);
+		if (options.sameStartingPosition)
+			initialPositions = generateSamePositions(agentsCount);
+		else
+			initialPositions = generateRandomPositions(agentsCount);
 		init(coverageAlgoz, options);
 	}
 

@@ -28,6 +28,7 @@ public class Options {
 	public boolean loadMap = false;	// Map is known/unknown
 	public String mapName = "rep";
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
+	public boolean sameStartingPosition = true;
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
