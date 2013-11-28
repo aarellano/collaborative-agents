@@ -7,10 +7,10 @@ import numpy
 
 
 #algorithms to test
-maps = ["empty"]#,"reg","rep","spiders"]
-algorithms = ["CFS"]
-collaborative = ["ORIG"]#,"GAUSS"]
-number_agents = [1,2,3]
+maps = ["empty","reg","rep","rooms"]
+algorithms = ["CFS","GS","DGS"]
+collaborative = ["ORIG","GAUSS", "FOLLOWERS_BRAKER", "SHARED_PLAN"]
+number_agents = [1,2,3,4,5,10]
 #TODO: not implemented yet
 initial_pos = ["random"]
 

@@ -8,10 +8,10 @@ config_file_prefix = "res/config/config"
 logs_path = "../res/logs/perf/"
 
 #algorithms to test
-maps = ["empty"]#,"reg","rep","spiders"]
+maps = ["empty","reg","rep","rooms"]
 maps_description = {}
-algorithms = ["CFS"]#,"DGS"]
-collaborative = ["ORIG","GAUSS"]
+algorithms = ["CFS","GS","DGS"]
+collaborative = ["ORIG","GAUSS", "FOLLOWERS_BRAKER", "SHARED_PLAN"]
 
 #number of agents to use
 number_agents = [1,2,3,4,5,10]
@@ -46,6 +46,10 @@ def parse_log_files(logs_path):
 		agents = split[1]
 		algorithm = split[2]
 		collaborative = split[3]
+		if (collaborative == "SHARED"):
+			collaborative = "SHARED_PLAN"
+		if (collaborative == "FOLLOWERS"):
+			collaborative = "FOLLOWERS_BRAKER"
 		log_fname = logs_path + '/' + log_fname
 		fd = open(log_fname)
 		values = []

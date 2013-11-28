@@ -31,7 +31,7 @@ public class PerformanceTest {
 	}
 
 	private void computeTotalNumberRevisitedCells(){
-		Vector<Point> everyStep = new Vector<Point> (getTotalNumberSteps());
+		Vector<Point> everyStep = new Vector<Point> ();
 
 		for (Agent agent : env.getSeekers()){
 			everyStep.addAll(agent.getTrajectory());
