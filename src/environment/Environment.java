@@ -502,6 +502,7 @@ public class Environment {
 				PERFORMANCE_LOG_FILE += options.numberAgents + "_";
 				PERFORMANCE_LOG_FILE += options.coverageAlgorithm + "_";
 				PERFORMANCE_LOG_FILE += options.collaborativeAlgorithm + "_";
+				PERFORMANCE_LOG_FILE += ((options.sameStartingPosition)?"fixed":"random") + "_";
 				for (Point pos : initialPositions){
 					PERFORMANCE_LOG_FILE += "x" + pos.col + "_";
 					PERFORMANCE_LOG_FILE += "y" + pos.row + "_";

@@ -52,6 +52,34 @@ public class Utils {
 		return maxs.get(selected);
 	}
 
+	public static Vector<Integer> indicesOfMin(Collection<Double> distances) {
+		Vector<Integer> res = new Vector<Integer>();
+		double min = minOfList(distances);
+		int counter = 0;
+		for (Double object : distances) {
+			// TODO: I'm assumming that the iterators move in order :-S
+			if(object == min) res.add(counter);
+			counter++;
+		}
+
+		return res;
+	}
+
+	public static Vector<Integer> indicesOfMin(Collection<Double> distances, int minimumCounter) {
+		Vector<Double>tmp = new Vector<Double>(distances);
+		Vector<Integer> res = new Vector<Integer>();
+		minimumCounter = Math.min(minimumCounter, distances.size());
+		int counter = 0;
+		while (counter < minimumCounter){
+			double min = minOfList(tmp);
+			res.add(tmp.indexOf(min));
+			tmp.remove(new Double(min));
+			counter++;
+		}
+
+		return res;
+	}
+
 	public static Double maxOfList(Collection<Double> list) {
 		Double max = 0.0;
 		for (Double object : list) {
@@ -114,21 +142,21 @@ public class Utils {
 			dx2 = 0 ;
 		}
 		int numerator = longest >> 1 ;
-			for (int i=0;i<=longest;i++) {
-				points.add(new Point(y, x));
-				numerator += shortest ;
-				if (!(numerator<longest)) {
-					numerator -= longest ;
-					x += dx1 ;
-					y += dy1 ;
-				} else {
-					x += dx2 ;
-					y += dy2 ;
-				}
+		for (int i=0;i<=longest;i++) {
+			points.add(new Point(y, x));
+			numerator += shortest ;
+			if (!(numerator<longest)) {
+				numerator -= longest ;
+				x += dx1 ;
+				y += dy1 ;
+			} else {
+				x += dx2 ;
+				y += dy2 ;
 			}
-			points.add(new Point(to.row, to.col));
+		}
+		points.add(new Point(to.row, to.col));
 
-			return points;
+		return points;
 	}
 
 	public static int getNextRandom(int max) {

@@ -26,15 +26,15 @@ public class Options {
 	public VisionDirectionEnum visionDirection = VisionDirectionEnum.FOUR_D;
 
 	public boolean loadMap = false;	// Map is known/unknown
-	public String mapName = "rep";
+	public String mapName = "empty";
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean sameStartingPosition = true;
 	public boolean fullCommunication = true;
 	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
-	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.FOLLOWERS_BRAKER;
+	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.GAUSS2;
 	public boolean collaborate = (collaborativeAlgorithm != CollaborativeAlgorithmEnum.ORIG);
-	public int numberAgents = 4;
+	public int numberAgents = 5;
 	public boolean useGUI = true;
 
 	// Environment settings
@@ -95,8 +95,8 @@ public class Options {
 
 			NodeList settings = doc.getElementsByTagName("GeneralSettings");
 			Node generalOptions = settings.item(0);
-			String text = extractTextFromXml(generalOptions, "startingPosManual");
-			startingPosManual = Boolean.parseBoolean(text);
+			String text = extractTextFromXml(generalOptions, "sameStartingPosition");
+			sameStartingPosition = Boolean.parseBoolean(text);
 			text = extractTextFromXml(generalOptions, "coverageAlgorithm");
 			coverageAlgorithm = CoverageAlgorithmEnum.valueOf(text);
 			text = extractTextFromXml(generalOptions, "collaborativeAlgorithm");
