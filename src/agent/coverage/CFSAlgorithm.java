@@ -53,6 +53,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 
 			break;
 		case GAUSS:
+		case GAUSS2:
 			GaussianWeight gaussian = new GaussianWeight(agent);
 			for (Vector<Point> traj : trajs) {
 				Point destination = traj.lastElement();
@@ -79,6 +80,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 		//		}
 		Vector<Path> paths = new Vector<Path>();
 		Vector<Double> weights = new Vector<Double>();
+		Vector<Double> distances = new Vector<Double>();
 		Path tempPath = null;
 		for(int row = 0; row < agent.getMap().getHeight(); row++) {
 			for(int col = 0; col < agent.getMap().getWidth(); col++) {
@@ -95,6 +97,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 					double weight = weightPath(path.getPathCells(), agent);
 					paths.add(path);
 					weights.add(new Double(weight));
+					distances.add(new Double(path.getPathCells().size()));
 				}
 			}
 		}
@@ -117,12 +120,26 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 				int index = toRemove.get(i)-i;
 				paths.remove(index);
 				weights.remove(index);
+				distances.remove(index);
 			}
 		}
 
 		if(paths.isEmpty())
 			return tempPath;
-		int selected = Utils.selectByMax(weights, 0);
+
+		int selected = 0;
+		if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.GAUSS){
+			selected = Utils.selectByMax(weights, 0);
+		} else {
+			Vector<Integer> indicesMinDistance = Utils.indicesOfMin(distances);
+			double maxWeight = 0;
+			for (int index : indicesMinDistance){
+				if (weights.get(index) > maxWeight){
+					selected = index;
+					maxWeight = weights.get(index);
+				}
+			}
+		}
 		return paths.get(selected);
 	}
 
@@ -131,6 +148,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 		CollaborativeAlgorithmEnum collaborate = agent.getEnv().options.collaborativeAlgorithm;
 		switch (collaborate) {
 		case GAUSS:
+		case GAUSS2:
 			weight = GaussianWeight.weightPath(agent, path);
 			break;
 			//		case FOLLOWERS_BRAKER:

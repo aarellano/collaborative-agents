@@ -80,7 +80,8 @@ public class GaussianWeight {
 		}
 		//System.out.println(endPoint);
 		// calculate variance
-		sigmaSquared = Math.abs(Math.tan(Math.toRadians(angle-1)))*width/4;
+		//		sigmaSquared = Math.abs(Math.tan(Math.toRadians(angle-1)))*width;
+		sigmaSquared = agent.getMap().getHeight()*agent.getMap().getWidth();
 	}
 
 	private void normalize() {

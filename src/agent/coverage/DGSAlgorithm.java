@@ -77,6 +77,7 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 					sum = sum + 1;
 				break;
 			case GAUSS:
+			case GAUSS2:
 				GaussianWeight gaussian = new GaussianWeight(agent);
 				Point destinationPoint = null;
 				for (int i = list.indexOf(((Vector<Point>) list).lastElement()); i >= 0; i--) {
