@@ -40,7 +40,11 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 			trajectory = sp.getCFS(status.coordinates, agent.getSearchMap());
 		}
 
-		Path result = agent.getMapBuilder().getPlanner().pathPlan(status, trajectory.lastElement());
+		Path result = null;
+		if (trajectory.isEmpty()) // Then stay in the same position, the work is done :)
+			result = agent.getMapBuilder().getPlanner().pathPlan(status, status.coordinates);
+		else
+			result = agent.getMapBuilder().getPlanner().pathPlan(status, trajectory.lastElement());
 
 		return result;
 	}
