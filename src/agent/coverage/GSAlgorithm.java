@@ -15,12 +15,17 @@ import agent.ShortestPathNaive;
 
 public class GSAlgorithm implements CoverageAlgorithm  {
 
-
 	Agent agent;
-	@SuppressWarnings("unchecked")
+	GaussianWeight gaussianWeight;
+
 	@Override
-	public Path selectPath(Agent agent) {
+	public void setAgent(Agent agent) {
 		this.agent = agent;
+		gaussianWeight = new GaussianWeight(agent);
+	}
+
+	@Override
+	public Path selectPath() {
 		AgentStatus status = agent.getStatus();
 		Map map = agent.getMap();
 		Vector<Point> trajectory;
@@ -83,14 +88,13 @@ public class GSAlgorithm implements CoverageAlgorithm  {
 					sum = sum + 1;
 				break;
 			case GAUSS:
-				GaussianWeight gaussian = new GaussianWeight(agent);
 				Point destinationPoint = null;
 				for (int i = 0; i <= list.indexOf(((Vector<Point>) list).lastElement()); i++) {
 					if (!agent.getSearchMap().isVisitedCell(list.get(i).row, list.get(i).col))
 						destinationPoint = new Point(list.get(i).row, list.get(i).col);
 				}
 				if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
-					sum = sum + 5.0 * gaussian.weightPoint(destinationPoint);
+					sum = sum + 5.0 * gaussianWeight.getWeight(destinationPoint);
 				break;
 			default:
 				break;

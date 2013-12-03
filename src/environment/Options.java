@@ -26,15 +26,15 @@ public class Options {
 	public VisionDirectionEnum visionDirection = VisionDirectionEnum.FOUR_D;
 
 	public boolean loadMap = false;	// Map is known/unknown
-	public String mapName = "empty";
+	public String mapName = "reg";
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean sameStartingPosition = true;
 	public boolean fullCommunication = true;
-	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
+	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.GS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
-	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.GAUSS2;
+	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.GAUSS;
 	public boolean collaborate = (collaborativeAlgorithm != CollaborativeAlgorithmEnum.ORIG);
-	public int numberAgents = 5;
+	public int numberAgents = 4;
 	public boolean useGUI = true;
 
 	// Environment settings

@@ -68,7 +68,7 @@ public class MainScreen implements Runnable {
 		GridLayout mainLayout = new GridLayout(1,false);
 		shell.setLayout(mainLayout);
 		GridData data = new GridData(GridData.FILL_VERTICAL);
-		shell.setSize(500+26, 500+165);
+		shell.setSize(500+11, 500+150);
 		shell.setBounds(150,50,shell.getSize().x,shell.getSize().y);
 
 		//creating the game space composite
@@ -160,8 +160,6 @@ public class MainScreen implements Runnable {
 		// Update View
 		if(debugToolbar != null)
 			debugToolbar.updateStatus();
-		if(toolbar != null)
-			toolbar.resetSlider();
 	}
 
 	// Game thread body
@@ -169,7 +167,7 @@ public class MainScreen implements Runnable {
 	public void run() {
 
 		// Experiment is a set of run tests
-		env.resetExperiment();
+		env.resetExperiment(env.options.mapName);
 		do {
 			env.startGame();
 			env.closeLoggers();
@@ -186,7 +184,6 @@ public class MainScreen implements Runnable {
 
 			// Update View
 			debugToolbar.updateStatus();
-			toolbar.resetSlider();
 
 			env.options.terminateGame = false;
 		}

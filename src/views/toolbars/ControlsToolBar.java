@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -24,6 +25,7 @@ public class ControlsToolBar {
 	private Button resetBtn;
 	private Scale sleep_trajectories_Slider;
 	private CLabel calendarLabel;
+	private Combo mapCombo;
 
 	public Composite parent;
 
@@ -62,7 +64,7 @@ public class ControlsToolBar {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				screen.stopGameThread();
-				screen.env.resetExperiment();
+				screen.env.resetExperiment(screen.env.options.mapName);
 				screen.startGameThread();
 			}
 		});
@@ -77,65 +79,69 @@ public class ControlsToolBar {
 			}
 		});
 
+		mapCombo = new Combo(parent, SWT.READ_ONLY);
+		mapCombo.setToolTipText("Map Name");
+		mapCombo.add("empty");
+		mapCombo.add("reg");
+		mapCombo.add("rep");
+		mapCombo.add("rooms");
+		mapCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				screen.env.options.mapName = mapCombo.getText();
+			}
+		});
+
+		//		data = new GridData();
+		//		data.exclude = false;
+		//		data.horizontalAlignment = GridData.FILL_BOTH;
+		//		mapCombo.setLayoutData(data);
+
 		sleep_trajectories_Slider = new Scale(parent, SWT.HORIZONTAL);
+		sleep_trajectories_Slider.setMinimum(0);
+		sleep_trajectories_Slider.setMaximum(500);
+		sleep_trajectories_Slider.setIncrement(50);
+		sleep_trajectories_Slider.setPageIncrement(50);
 		sleep_trajectories_Slider.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if(screen.isAlive()) {
 					screen.env.options.sleepTime = sleep_trajectories_Slider.getSelection();
 					sleep_trajectories_Slider.setToolTipText(screen.env.options.sleepTime+"");
-				} else if(screen.env.options.ViewTrajectories) {
-					screen.env.options.loadGameNumber = sleep_trajectories_Slider.getSelection();
-					sleep_trajectories_Slider.setToolTipText(screen.env.options.loadGameNumber+"");
-					screen.env.loadTrajectories(screen.env.options.loadGameNumber);
-					screen.env.screen.redraw();
 				}
+				//				else if(screen.env.options.ViewTrajectories) {
+				//					screen.env.options.loadGameNumber = sleep_trajectories_Slider.getSelection();
+				//					sleep_trajectories_Slider.setToolTipText(screen.env.options.loadGameNumber+"");
+				//					screen.env.loadTrajectories(screen.env.options.loadGameNumber);
+				//					screen.env.screen.redraw();
+				//				}
 			}
 		});
-		sleep_trajectories_Slider.setFocus();
 
 		calendarLabel = new CLabel(parent, SWT.NONE);
-		calendarLabel.setText("Iterations / Games");
+		calendarLabel.setText("0");
+
+		//		data = new GridData();
+		//		data.exclude = false;
+		//		data.horizontalAlignment = GridData.FILL_BOTH;
+		//		sleep_trajectories_Slider.setLayoutData(data);
+		//		calendarLabel.setLayoutData(data);
+		//		//		parent.layout(true);
 
 
-		resetSlider();
-	}
+		mapCombo.setFocus();
+		updateStatus();
 
-	public void resetSlider() {
-		if(parent.isDisposed()) return;
-		if(screen.isAlive()) {
-			sleep_trajectories_Slider.setMinimum(0);
-			sleep_trajectories_Slider.setMaximum(500);
-			sleep_trajectories_Slider.setIncrement(50);
-			sleep_trajectories_Slider.setPageIncrement(50);
-			sleep_trajectories_Slider.setSelection(screen.env.options.sleepTime);
-			sleep_trajectories_Slider.setToolTipText(screen.env.options.sleepTime+"");
-		} else {
-			sleep_trajectories_Slider.setMinimum(1);
-			sleep_trajectories_Slider.setMaximum(1000);
-			sleep_trajectories_Slider.setIncrement(1);
-			sleep_trajectories_Slider.setPageIncrement(1);
-			sleep_trajectories_Slider.setSelection(screen.env.options.loadGameNumber);
-			sleep_trajectories_Slider.setToolTipText(screen.env.options.loadGameNumber+"");
-		}
-	}
-
-	public int getComponentSize() {
-		return (startBtn.computeSize(SWT.DEFAULT,SWT.DEFAULT).x+
-				resetBtn.computeSize(SWT.DEFAULT,SWT.DEFAULT).x+
-				calendarLabel.computeSize(SWT.DEFAULT,SWT.DEFAULT).x+
-				sleep_trajectories_Slider.computeSize(SWT.DEFAULT,SWT.DEFAULT).x+
-				optionsBtn.computeSize(SWT.DEFAULT,SWT.DEFAULT).x);
 	}
 
 	public int getComponentsCount() {
-		return 5;
+		return 6;
 	}
 
 	public void updateView() {
 		String text = "";
 
-		text = screen.env.clock.getRelativeTimeInClocks()+" / "+(screen.env.clock.getGamesCount()+1)+" Games";
+		text = screen.env.clock.getRelativeTimeInClocks()+"";
 		calendarLabel.setText(text);
 		updateStatus();
 	}
@@ -146,5 +152,10 @@ public class ControlsToolBar {
 		} else {
 			startBtn.setImage(new Image(parent.getDisplay(), "res/imgs/terminate.png"));
 		}
+		sleep_trajectories_Slider.setEnabled(!screen.env.isGameOver());
+		mapCombo.setEnabled(screen.env.isGameOver());
+		sleep_trajectories_Slider.setSelection(screen.env.options.sleepTime);
+		sleep_trajectories_Slider.setToolTipText(screen.env.options.sleepTime+"");
+		mapCombo.setText(screen.env.options.mapName);
 	}
 }

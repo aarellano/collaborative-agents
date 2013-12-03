@@ -14,7 +14,6 @@ import lib.datastructs.Point;
 import views.MainScreen;
 import agent.Agent;
 import agent.AgentStatus;
-import agent.coverage.CoverageAlgorithmEnum;
 
 public class Environment {
 
@@ -36,12 +35,11 @@ public class Environment {
 	public String testName = "t";
 	String LOG_FILE, GAMES_LOG_FILE, MEETINGS_LOG_FILE, TRAJS_LOG_FILE;
 
-	public void init(CoverageAlgorithmEnum coverageAlgoz, Options opt) {
+	public void init(Options opt) {
 		if (opt != null)
 			options = opt;
 		else
 			options = new Options("");
-		options.coverageAlgorithm = coverageAlgoz;
 
 		tipInfo = new Hashtable<Point, String>();
 		maxs = new Vector<Point>();
@@ -60,27 +58,27 @@ public class Environment {
 		}
 	}
 
-	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz, Options options) {
+	public Environment(String mapID, int agentsCount, Options options) {
 		map = Map.loadMapWithID(mapID);
 		if (options.sameStartingPosition)
 			initialPositions = generateSamePositions(agentsCount);
 		else
 			initialPositions = generateRandomPositions(agentsCount);
-		init(coverageAlgoz, options);
+		init(options);
 	}
 
-	public Environment(String mapID, int agentsCount, CoverageAlgorithmEnum coverageAlgoz) {
-		this(mapID, agentsCount, coverageAlgoz, null);
+	public Environment(String mapID, int agentsCount) {
+		this(mapID, agentsCount, null);
 	}
 
-	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz, Options options) {
+	public Environment(String mapID, Point[] coordinates, Options options) {
 		map = Map.loadMapWithID(mapID);
 		initialPositions = coordinates;
-		init(coverageAlgoz, options);
+		init(options);
 	}
 
-	public Environment(String mapID, Point[] coordinates, CoverageAlgorithmEnum coverageAlgoz) {
-		this(mapID, coordinates, coverageAlgoz, null);
+	public Environment(String mapID, Point[] coordinates) {
+		this(mapID, coordinates, null);
 	}
 
 	/**
@@ -88,6 +86,11 @@ public class Environment {
 	 * @category Initializers
 	 * ///////////////////////////////////////////////////////////////////////////
 	 */
+
+	public void resetExperiment(String mapID) {
+		map = Map.loadMapWithID(mapID);
+		init(options);
+	}
 
 	public void resetExperiment() {
 

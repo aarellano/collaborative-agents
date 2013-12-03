@@ -5,5 +5,7 @@ import agent.Agent;
 
 public interface CoverageAlgorithm {
 
-	public Path selectPath(Agent agent);
+	public void setAgent(Agent agent);
+	public Path selectPath();
+
 }

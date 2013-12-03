@@ -12,6 +12,8 @@ public class GaussianWeight {
 	private Point mean;
 	private double sigmaSquared, normalFactor = 1;
 
+	private double[][] weights;
+
 	public GaussianWeight(Agent agent) {
 		this(agent, agent.getEnv().getSeekersCount(),
 				new Point(agent.getMap().getHeight()/2,
@@ -20,8 +22,14 @@ public class GaussianWeight {
 
 	public GaussianWeight(Agent agent, int agentsCount, Point center) {
 		this.agent = agent;
+		weights = new double[agent.getMap().getHeight()][agent.getMap().getWidth()];
 		calculateParameters(center, agentsCount);
 		normalize();
+		for(int row = 0; row < weights.length; row++) {
+			for(int col = 0; col < weights[0].length; col++) {
+				weights[row][col] = weightPoint(new Point(row, col));
+			}
+		}
 	}
 
 	private void calculateParameters(Point origin, int count) {
@@ -94,7 +102,11 @@ public class GaussianWeight {
 		normalFactor = sum;
 	}
 
-	public double weightPoint(Point p) {
+	public double getWeight(Point p) {
+		return weights[p.row][p.col];
+	}
+
+	private double weightPoint(Point p) {
 		Point x = new Point(p.row - mean.row, p.col - mean.col);
 		double pow = -0.5 * (x.row*x.row + x.col*x.col) / sigmaSquared;
 		double phi = Math.exp(pow) / Math.sqrt(2 * Math.PI * sigmaSquared);
@@ -105,15 +117,15 @@ public class GaussianWeight {
 		Point destination = path.lastElement();
 		double weight =  path.size() + 1;/// (agent.getMap().getWidth()*agent.getMap().getHeight()); // normalize
 		weight = 1.0 / weight;
-		weight = this.weightPoint(destination) * weight;
+		weight = getWeight(destination) * weight;//this.weightPoint(destination) * weight;
 		return weight;
 	}
 
-	public static double weightPath(Agent agent, Vector<Point> path, int partitionsCount, Point center) {
-		return new GaussianWeight(agent, partitionsCount, center).weightPath(path);
-	}
-
-	public static double weightPath(Agent agent, Vector<Point> path) {
-		return new GaussianWeight(agent).weightPath(path);
-	}
+	//	public static double weightPath(Agent agent, Vector<Point> path, int partitionsCount, Point center) {
+	//		return new GaussianWeight(agent, partitionsCount, center).weightPath(path);
+	//	}
+	//
+	//	public static double weightPath(Agent agent, Vector<Point> path) {
+	//		return new GaussianWeight(agent).weightPath(path);
+	//	}
 }

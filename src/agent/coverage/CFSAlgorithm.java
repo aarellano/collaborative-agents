@@ -7,72 +7,21 @@ import lib.Utils;
 import lib.datastructs.Path;
 import lib.datastructs.Point;
 import agent.Agent;
-import agent.AgentStatus;
-import agent.MapBuilder;
-import agent.SearchMap;
-import agent.ShortestPathNaive;
 
 public class CFSAlgorithm implements CoverageAlgorithm {
 
 	Random rand = new Random(System.currentTimeMillis());
+	Agent agent;
+	GaussianWeight gaussianWeight;
 
-	public Path getPath(Agent agent) {
-
-		MapBuilder mapInfo = agent.getMapBuilder();
-		AgentStatus status = agent.getStatus();
-		SearchMap map = agent.getSearchMap();
-
-		ShortestPathNaive sp = new ShortestPathNaive(agent);
-		Vector<Vector<Point>> trajs = sp.getCFSTrajectories(status.coordinates, map, agent.getEnv().options.numberAgents);
-		Vector<Point> trajectory = choosePath(trajs, agent);
-
-		//Vector<Point> trajectory = sp.getCFS(status.coordinates, map, agent.getEnv().options.numberAgents);
-
-		Path result = mapInfo.getPlanner().pathPlan(status, trajectory.lastElement());
-		//result.getPathCells().addAll(trajectory);
-		//result.setActionsFromTrajectory(status);
-
-		//System.out.println("selected("+row+","+col+")");
-
-		//		if(agent.getEnv().options.debugMode) {
-		//			agent.getEnv().maxs.clear();
-		//			Vector<Integer> maxs = Utils.maxsOfList(collections.values);
-		//			for (Integer i : maxs) {
-		//				agent.getEnv().maxs.add(collections.points.get(i));
-		//			}
-		//		}
-
-		return result;
-	}
-
-	private Vector<Point> choosePath(Vector<Vector<Point>> trajs, Agent agent) {
-		CollaborativeAlgorithmEnum collaborate = agent.getEnv().options.collaborativeAlgorithm;
-		Vector<Double> weights = new Vector<Double>();
-		switch (collaborate) {
-		case ORIG:
-
-			break;
-		case GAUSS:
-		case GAUSS2:
-			GaussianWeight gaussian = new GaussianWeight(agent);
-			for (Vector<Point> traj : trajs) {
-				Point destination = traj.lastElement();
-				double weight = gaussian.weightPoint(destination) * traj.size()/(agent.getMap().getWidth()*agent.getMap().getHeight());
-				weights.add(new Double(weight));
-			}
-			break;
-		case FOLLOWERS_BRAKER:
-
-			break;
-		default:
-			break;
-		}
-		int index = Utils.selectByMax(weights, 0);
-		return trajs.get(index);
+	@Override
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+		gaussianWeight = new GaussianWeight(agent);
 	}
 
 	@Override
-	public Path selectPath(Agent agent) {
+	public Path selectPath() {
 		//		System.out.println("ID:"+agent.getID());
 		//		int r = agent.getStatus().coordinates.row, c = agent.getStatus().coordinates.col;
 		//		if(agent.getMap().isObstacle(r, c)) {
@@ -128,9 +77,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 			return tempPath;
 
 		int selected = 0;
-		if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.GAUSS){
-			selected = Utils.selectByMax(weights, 0);
-		} else {
+		if (agent.getEnv().options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.GAUSS2){
 			Vector<Integer> indicesMinDistance = Utils.indicesOfMin(distances);
 			double maxWeight = 0;
 			for (int index : indicesMinDistance){
@@ -139,6 +86,8 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 					maxWeight = weights.get(index);
 				}
 			}
+		} else {
+			selected = Utils.selectByMax(weights, 0);
 		}
 		return paths.get(selected);
 	}
@@ -149,7 +98,7 @@ public class CFSAlgorithm implements CoverageAlgorithm {
 		switch (collaborate) {
 		case GAUSS:
 		case GAUSS2:
-			weight = GaussianWeight.weightPath(agent, path);
+			weight = gaussianWeight.weightPath(path);
 			break;
 			//		case FOLLOWERS_BRAKER:
 			//			Vector<Point> agents = agent.getAgentNeighborsWithinRange(2);

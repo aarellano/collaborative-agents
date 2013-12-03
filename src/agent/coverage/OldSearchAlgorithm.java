@@ -15,8 +15,16 @@ import agent.MapBuilder;
 
 public class OldSearchAlgorithm implements CoverageAlgorithm {
 
+	Agent agent;
+
 	@Override
-	public Path selectPath(Agent agent) {
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+
+
+	@Override
+	public Path selectPath() {
 
 		MapBuilder mapInfo = agent.getMapBuilder();
 		AgentStatus status = agent.getStatus();

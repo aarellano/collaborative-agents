@@ -1,7 +1,6 @@
 
 
 import views.MainScreen;
-import agent.coverage.CoverageAlgorithmEnum;
 import environment.Environment;
 import environment.Options;
 
@@ -21,13 +20,12 @@ public class Main {
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(20, 20)};
 		//Point[] initialPos = new Point[] {new Point(0, 0), new Point(0, 0), new Point(0, 0)};
 		int strategy = Options.DIAGONAL;
-		CoverageAlgorithmEnum coverageAlgoz = options.coverageAlgorithm;
 		boolean useGUI = options.useGUI;
 		int numberAgents = options.numberAgents;
 
 		// Initialize the environment
 		//Environment env = new Environment(mapName, initialPos, coverageAlgoz);
-		Environment env = new Environment(mapName, numberAgents, coverageAlgoz, options);
+		Environment env = new Environment(mapName, numberAgents, options);
 		env.options.strategy = strategy;
 		env.testName = env.getEnvID()+"/"+
 				"S"+env.getSeekersCount()+"/"+

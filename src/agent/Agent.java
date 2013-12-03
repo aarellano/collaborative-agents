@@ -70,7 +70,10 @@ public class Agent {
 		case GS:
 			coverageAlgorithm = new GSAlgorithm();
 			break;
+		default:
+			break;
 		}
+		coverageAlgorithm.setAgent(this);
 	}
 
 	/**
@@ -288,7 +291,7 @@ public class Agent {
 
 	private Path selectPath() {
 
-		return coverageAlgorithm.selectPath(this);
+		return coverageAlgorithm.selectPath();
 	}
 
 	public PriorityQueue<PointValue> evaluateCells(Vector<Point> cells) {

@@ -24,6 +24,7 @@ public class GridCanvas extends Canvas {
 	private MainScreen parent;
 	public int origin_x, origin_y;
 	private Color[] agentColors;
+	private BasicStroke[] agentStrokes;
 
 	//private Image breakpoint = Toolkit.getDefaultToolkit().getImage("break.png");
 
@@ -54,6 +55,11 @@ public class GridCanvas extends Canvas {
 			agentColors = new Color[parent.env.getSeekers().length];
 			for(int i = 0 ; i < agentColors.length; i++) {
 				agentColors[i] = colors[i%colors.length];
+			}
+
+			agentStrokes = new BasicStroke[parent.env.getSeekers().length];
+			for(int i = 0 ; i < agentStrokes.length; i++) {
+				agentStrokes[i] = strokes[i%strokes.length];
 			}
 		}
 
@@ -88,7 +94,7 @@ public class GridCanvas extends Canvas {
 					bBG.setColor(Color.CYAN);
 					bBG.fillOval(origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1, widthOfCol/2, heightOfRow/2);
 					//	    				bBG.drawImage(breakpoint,
-							//	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1,
+					//	    						origin_x+j*widthOfCol+1, origin_y+i*heightOfRow+1,
 					//	    						widthOfCol-1, heightOfRow-1,
 					//	    						this);
 				}
@@ -212,6 +218,15 @@ public class GridCanvas extends Canvas {
 			new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
 					10.0f, new float[] {2f}, 0.0f);
 
+	BasicStroke[] strokes = { new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+			10.0f, new float[] {2f}, 0.0f),
+			new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+					10.0f, new float[] {4f}, 0.0f),
+					new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+							10.0f, new float[] {6f}, 0.0f),
+							new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+									10.0f, new float[] {2f}, 0.0f)};
+
 	public void drawTrajectories(Graphics g, int id) {
 		int width = getSize().width, height = getSize().height;
 		int heightOfRow = height / rows;
@@ -309,8 +324,9 @@ public class GridCanvas extends Canvas {
 		Color color = Color.DARK_GRAY;
 		if(true || !isDuplicated(current, next, agent)) {
 			color = agentColors[id-1];
-			if(id == 1) g2d.setStroke(dashed);
-			else g2d.setStroke(dotted);
+			//			if(id == 1) g2d.setStroke(dashed);
+			//			else g2d.setStroke(dotted);
+			g2d.setStroke(agentStrokes[id-1]);
 		} else
 			g2d.setStroke(solid);
 		g2d.setColor(color);

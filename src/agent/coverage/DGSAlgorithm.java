@@ -15,13 +15,23 @@ import agent.ShortestPathNaive;
 
 public class DGSAlgorithm implements CoverageAlgorithm {
 	Agent agent;
-	@SuppressWarnings("unchecked")
+	int region = 5;
+	Vector<Agent> neighbors;
+	GaussianWeight gaussianWeight;
+
 	@Override
-	public Path selectPath(Agent agent) {
+	public void setAgent(Agent agent) {
 		this.agent = agent;
+		gaussianWeight = new GaussianWeight(agent);
+	}
+
+	@Override
+	public Path selectPath() {
 		AgentStatus status = agent.getStatus();
 		Map map = agent.getMap();
 		Vector<Point> trajectory;
+
+		neighbors = agent.getAgentNeighborsWithinRange(region);
 
 		Vector<Vector<Point>> vis = agent.getEnv().getVisibility(status.coordinates, agent.getEnv().options.Ds, map);
 		Collections.sort(vis, greedyComparator);
@@ -78,14 +88,27 @@ public class DGSAlgorithm implements CoverageAlgorithm {
 				break;
 			case GAUSS:
 			case GAUSS2:
-				GaussianWeight gaussian = new GaussianWeight(agent);
 				Point destinationPoint = null;
 				for (int i = list.indexOf(((Vector<Point>) list).lastElement()); i >= 0; i--) {
 					if (!agent.getSearchMap().isVisitedCell(list.get(i).row, list.get(i).col))
 						destinationPoint = new Point(list.get(i).row, list.get(i).col);
 				}
 				if (!agent.getSearchMap().isVisitedCell(point.row, point.col))
-					sum = sum + 5.0 * gaussian.weightPoint(destinationPoint);
+					sum = sum + 5.0 * gaussianWeight.getWeight(destinationPoint);
+				break;
+			case FOLLOWERS_BRAKER:
+				if (!agent.getSearchMap().isVisitedCell(point.row, point.col)) {
+					boolean usePoint = true;
+					for (Agent neighbor : neighbors) {
+						if(agent.getID() > neighbor.getID() &&
+								agent.getMapBuilder().getPlanner().getDistanceInPoints(point,
+										neighbor.getStatus().coordinates) < region) {
+							usePoint = false;
+							break;
+						}
+					}
+					if(usePoint) sum ++;
+				}
 				break;
 			default:
 				break;
