@@ -30,7 +30,7 @@ public class Options {
 	public boolean startingPosManual = true;	// starting positions are manual in code, or loaded from the map
 	public boolean sameStartingPosition = true;
 	public boolean fullCommunication = true;
-	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.GS;
+	public CoverageAlgorithmEnum coverageAlgorithm = CoverageAlgorithmEnum.CFS;
 	public boolean takeRisk = false; // Compute nearest neighbors in map using unvisited or unknown
 	public CollaborativeAlgorithmEnum collaborativeAlgorithm = CollaborativeAlgorithmEnum.GAUSS;
 	public boolean collaborate = (collaborativeAlgorithm != CollaborativeAlgorithmEnum.ORIG);

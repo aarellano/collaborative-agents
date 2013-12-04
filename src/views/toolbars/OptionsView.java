@@ -11,12 +11,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 
+import agent.coverage.CollaborativeAlgorithmEnum;
+import agent.coverage.CoverageAlgorithmEnum;
 import environment.Environment;
 
 public class OptionsView {
@@ -64,6 +67,8 @@ public class OptionsView {
 		GridData data = new GridData(GridData.FILL_BOTH);
 		data.horizontalSpan =2;
 
+		createAlgozOptionsComponents(shell);
+
 		createGameOptionsComponents(shell);
 
 		createeViewOptionsComponents(shell);
@@ -83,6 +88,71 @@ public class OptionsView {
 			}
 		});
 	}
+
+	private void createAlgozOptionsComponents(Composite parent) {
+
+		Group group = new Group(shell, SWT.SHADOW_IN);
+		group.setText("Algorithm Options");
+		group.setLayout(new GridLayout(1,true));
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		// Sight Distance Range
+		Composite row = new Composite(group, SWT.NONE);
+		row.setLayout(new RowLayout());
+		(new CLabel(row, SWT.NONE)).setText("Coverage Algorithm");
+		final Combo AlgozCombo = new Combo(row, SWT.READ_ONLY);
+		AlgozCombo.add("CFS");
+		AlgozCombo.add("GS");
+		AlgozCombo.add("DGS");
+		if(env.options.coverageAlgorithm == CoverageAlgorithmEnum.CFS)
+			AlgozCombo.select(0);
+		else if(env.options.coverageAlgorithm == CoverageAlgorithmEnum.GS)
+			AlgozCombo.select(1);
+		else if(env.options.coverageAlgorithm == CoverageAlgorithmEnum.DGS)
+			AlgozCombo.select(2);
+		AlgozCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if(AlgozCombo.getText().equals("CFS"))
+					env.options.coverageAlgorithm = CoverageAlgorithmEnum.CFS;
+				else if(AlgozCombo.getText().equals("GS"))
+					env.options.coverageAlgorithm = CoverageAlgorithmEnum.GS;
+				else if(AlgozCombo.getText().equals("DGS"))
+					env.options.coverageAlgorithm = CoverageAlgorithmEnum.DGS;
+			}
+		});
+
+		row = new Composite(group, SWT.NONE);
+		row.setLayout(new RowLayout());
+		(new CLabel(row, SWT.NONE)).setText("Collaboration:");
+		final Combo collCombo = new Combo(row, SWT.READ_ONLY);
+		collCombo.add("Non");
+		collCombo.add("Offline Weights");
+		collCombo.add("Shared");
+		collCombo.add("Scatter");
+		if(env.options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.ORIG)
+			collCombo.select(0);
+		else if(env.options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.GAUSS)
+			collCombo.select(1);
+		else if(env.options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.SHARED_PLAN)
+			collCombo.select(2);
+		else if(env.options.collaborativeAlgorithm == CollaborativeAlgorithmEnum.FOLLOWERS_BRAKER)
+			collCombo.select(3);
+		collCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if(collCombo.getText().equals("Non"))
+					env.options.collaborativeAlgorithm = CollaborativeAlgorithmEnum.ORIG;
+				else if(collCombo.getText().equals("Offline Weights"))
+					env.options.collaborativeAlgorithm = CollaborativeAlgorithmEnum.GAUSS;
+				else if(collCombo.getText().equals("Shared"))
+					env.options.collaborativeAlgorithm = CollaborativeAlgorithmEnum.SHARED_PLAN;
+				else if(collCombo.getText().equals("Scatter"))
+					env.options.collaborativeAlgorithm = CollaborativeAlgorithmEnum.FOLLOWERS_BRAKER;
+			}
+		});
+	}
+
 
 	private void createGameOptionsComponents(Composite parent) {
 
